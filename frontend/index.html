@@ -89,18 +89,17 @@
             <!-- AI Icon -->
             <div class="flex justify-center mb-8">
                 <div class="relative group">
-                    <div class="w-24 h-24 bg-gradient-to-br from-blue-500 via-blue-600 to-cyan-500 rounded-2xl flex items-center justify-center shadow-2xl animate-pulse-slow accent-glow">
-                        <svg class="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <div class="w-20 h-20 bg-gradient-to-br from-blue-500 via-blue-600 to-blue-700 rounded-2xl flex items-center justify-center shadow-2xl accent-glow">
+                        <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path>
                         </svg>
                     </div>
-                    <div class="absolute -inset-3 bg-gradient-to-br from-blue-400/20 to-cyan-400/20 rounded-2xl blur-lg opacity-60 group-hover:opacity-80 transition duration-1000 animate-pulse-slow"></div>
                 </div>
             </div>
 
             <!-- Title -->
-            <h1 class="text-5xl md:text-6xl font-bold text-white mb-4 tracking-tight">
-                <span class="bg-gradient-to-r from-blue-400 via-cyan-300 to-slate-200 bg-clip-text text-transparent">
+            <h1 class="text-5xl md:text-6xl font-bold text-white mb-6 tracking-tight">
+                <span class="bg-gradient-to-r from-blue-400 via-cyan-300 to-blue-200 bg-clip-text text-transparent">
                     Voice Agent
                 </span>
             </h1>
@@ -111,22 +110,21 @@
             </p>
             
             <!-- Day indicator -->
-            <div class="mb-8 inline-flex items-center space-x-2 bg-blue-500/10 px-4 py-2 rounded-full border border-blue-500/20">
+            <div class="mb-8 inline-flex items-center space-x-2 bg-blue-600/20 px-4 py-2 rounded-full border border-blue-500/30">
                 <div class="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></div>
                 <span class="text-blue-300 text-sm font-medium">REST TTS API Integration</span>
             </div>
             
             <!-- Description -->
-            <p class="text-slate-400 mb-12 text-lg leading-relaxed max-w-lg mx-auto">
-                Experience the future of voice interaction with our cutting-edge AI agent. 
-                Now featuring Text-to-Speech API integration with Murf for professional voice synthesis.
+            <p class="text-slate-400 mb-12 text-lg leading-relaxed max-w-2xl mx-auto">
+                Experience the future of voice interaction with our cutting-edge AI agent. Now featuring Text-to-Speech API integration with Murf for professional voice synthesis.
             </p>
 
             <!-- Action Button -->
-            <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+            <div class="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8">
                 <button 
                     onclick="greet()" 
-                    class="voice-pulse group relative inline-flex items-center justify-center px-8 py-4 text-lg font-medium text-white transition-all duration-300 bg-gradient-to-r from-blue-600 to-blue-500 rounded-2xl hover:from-blue-500 hover:to-cyan-500 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 focus:ring-offset-slate-900 transform hover:scale-105 active:scale-95 shadow-xl border border-blue-500/20"
+                    class="voice-pulse group relative inline-flex items-center justify-center px-8 py-4 text-lg font-semibold text-white transition-all duration-300 bg-gradient-to-r from-blue-600 to-blue-500 rounded-2xl hover:from-blue-500 hover:to-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 focus:ring-offset-slate-900 transform hover:scale-105 active:scale-95 shadow-xl border border-blue-500/30"
                 >
                     <svg class="w-6 h-6 mr-3 group-hover:animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 14.142M9 9a3 3 0 000 6v-6a3 3 0 000-6z"></path>
@@ -134,7 +132,7 @@
                     Activate Voice Agent
                 </button>
                 
-                <a href="/docs" target="_blank" class="group inline-flex items-center justify-center px-6 py-3 text-lg font-medium text-slate-300 transition-all duration-300 border-2 border-slate-600 rounded-2xl hover:bg-slate-700 hover:text-white hover:border-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 focus:ring-offset-slate-900 transform hover:scale-105 backdrop-blur-sm">
+                <a href="/docs" target="_blank" class="group inline-flex items-center justify-center px-6 py-3 text-lg font-medium text-slate-300 transition-all duration-300 border-2 border-slate-600/60 rounded-2xl hover:bg-slate-700/50 hover:text-white hover:border-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 focus:ring-offset-slate-900 transform hover:scale-105 backdrop-blur-sm">
                     <svg class="w-5 h-5 mr-2 group-hover:rotate-12 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                     </svg>
@@ -143,7 +141,7 @@
             </div>
 
             <!-- Quick Links -->
-            <div class="mt-8 flex flex-wrap justify-center gap-4">
+            <div class="flex flex-wrap justify-center gap-6">
                 <a href="/docs" target="_blank" class="inline-flex items-center space-x-2 text-blue-400 hover:text-blue-300 transition-colors group">
                     <svg class="w-4 h-4 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
@@ -164,14 +162,6 @@
                     </svg>
                     <span class="text-sm font-medium">Available Voices</span>
                 </a>
-            </div>
-
-            <!-- Status Indicator -->
-            <div class="mt-8 flex items-center justify-center">
-                <div class="flex items-center space-x-2 bg-emerald-500/10 px-4 py-2 rounded-full border border-emerald-500/20">
-                    <div class="w-3 h-3 bg-emerald-400 rounded-full animate-pulse shadow-lg shadow-emerald-400/50"></div>
-                    <span class="text-emerald-300 text-sm font-medium">Agent Ready</span>
-                </div>
             </div>
         </div>
     </div>
