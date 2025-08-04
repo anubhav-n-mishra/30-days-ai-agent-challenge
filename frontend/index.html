@@ -1,7 +1,9 @@
 <!<head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Voice Agent - Day 2</title>
+    <meta name="viewport" content="width=device-width, initial-scale            <!-- Subtitle -->
+            <p class="text-xl md:text-2xl text-slate-300 mb-4 font-light">
+                30 Days Challenge - Day 3
+            </p>itle>Voice Agent - Day 2</title>
     <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
     <script src="https://cdn.tailwindcss.com"></script>PE html>
 <html lang="en">
@@ -106,38 +108,65 @@
             
             <!-- Subtitle -->
             <p class="text-xl md:text-2xl text-slate-300 mb-4 font-light">
-                30 Days Challenge - Day 2
+                30 Days Challenge - Day 3
             </p>
+            
+            <!-- Navigation Link -->
+            <div class="mb-6">
+                <a href="/voice-generation" class="inline-flex items-center space-x-2 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-medium py-2 px-6 rounded-full transition-all duration-300 transform hover:scale-105 shadow-lg">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M7 4a3 3 0 016 0v4a3 3 0 11-6 0V4zm4 10.93A7.001 7.001 0 0017 8a1 1 0 10-2 0A5 5 0 015 8a1 1 0 00-2 0 7.001 7.001 0 006 6.93V17H6a1 1 0 100 2h8a1 1 0 100-2h-3v-2.07z" clip-rule="evenodd"></path>
+                    </svg>
+                    <span>Advanced Voice Generation</span>
+                </a>
+            </div>
             
             <!-- Day indicator -->
             <div class="mb-8 inline-flex items-center space-x-2 bg-blue-600/20 px-4 py-2 rounded-full border border-blue-500/30">
                 <div class="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></div>
-                <span class="text-blue-300 text-sm font-medium">REST TTS API Integration</span>
+                <span class="text-blue-300 text-sm font-medium">TTS Audio Playback Integration</span>
             </div>
             
             <!-- Description -->
-            <p class="text-slate-400 mb-12 text-lg leading-relaxed max-w-2xl mx-auto">
-                Experience the future of voice interaction with our cutting-edge AI agent. Now featuring Text-to-Speech API integration with Murf for professional voice synthesis.
+            <p class="text-slate-400 mb-8 text-lg leading-relaxed max-w-2xl mx-auto">
+                Experience our advanced AI voice technology. Choose from preset messages or create custom speech from any text with natural-sounding voices.
             </p>
 
-            <!-- Action Button -->
-            <div class="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8">
-                <button 
-                    onclick="greet()" 
-                    class="voice-pulse group relative inline-flex items-center justify-center px-8 py-4 text-lg font-semibold text-white transition-all duration-300 bg-gradient-to-r from-blue-600 to-blue-500 rounded-2xl hover:from-blue-500 hover:to-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 focus:ring-offset-slate-900 transform hover:scale-105 active:scale-95 shadow-xl border border-blue-500/30"
-                >
-                    <svg class="w-6 h-6 mr-3 group-hover:animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 14.142M9 9a3 3 0 000 6v-6a3 3 0 000-6z"></path>
-                    </svg>
-                    Activate Voice Agent
-                </button>
-                
-                <a href="/docs" target="_blank" class="group inline-flex items-center justify-center px-6 py-3 text-lg font-medium text-slate-300 transition-all duration-300 border-2 border-slate-600/60 rounded-2xl hover:bg-slate-700/50 hover:text-white hover:border-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 focus:ring-offset-slate-900 transform hover:scale-105 backdrop-blur-sm">
-                    <svg class="w-5 h-5 mr-2 group-hover:rotate-12 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                    </svg>
-                    API Docs
-                </a>
+            <!-- Action Buttons -->
+            <div class="space-y-6">
+                <!-- Main Voice Generation Button -->
+                <div class="text-center">
+                    <a href="/voice-generation" class="inline-flex items-center space-x-3 bg-gradient-to-r from-blue-600 via-purple-600 to-blue-600 hover:from-blue-700 hover:via-purple-700 hover:to-blue-700 text-white font-semibold py-4 px-8 rounded-2xl transition-all duration-300 transform hover:scale-105 shadow-2xl border border-blue-500/30">
+                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M7 4a3 3 0 016 0v4a3 3 0 11-6 0V4zm4 10.93A7.001 7.001 0 0017 8a1 1 0 10-2 0A5 5 0 015 8a1 1 0 00-2 0 7.001 7.001 0 006 6.93V17H6a1 1 0 100 2h8a1 1 0 100-2h-3v-2.07z" clip-rule="evenodd"></path>
+                        </svg>
+                        <span>Create Custom Voice</span>
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                        </svg>
+                    </a>
+                    <p class="text-slate-500 text-sm mt-2">Advanced text-to-speech with customizable voices</p>
+                </div>
+
+                <!-- Preset Voice Messages -->
+                <div class="grid md:grid-cols-2 gap-4 max-w-2xl mx-auto">
+                    <button 
+                        onclick="greet()" 
+                        class="voice-pulse group relative inline-flex items-center justify-center px-6 py-3 text-base font-semibold text-white transition-all duration-300 bg-gradient-to-r from-green-600 to-emerald-500 rounded-xl hover:from-green-500 hover:to-emerald-400 focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-2 focus:ring-offset-slate-900 transform hover:scale-105 active:scale-95 shadow-lg border border-green-500/30"
+                    >
+                        <svg class="w-5 h-5 mr-2 group-hover:animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 14.142M9 9a3 3 0 000 6v-6a3 3 0 000-6z"></path>
+                        </svg>
+                        Try Demo Voice
+                    </button>
+                    
+                    <a href="/docs" target="_blank" class="group inline-flex items-center justify-center px-6 py-3 text-base font-medium text-slate-300 transition-all duration-300 border-2 border-slate-600/60 rounded-xl hover:bg-slate-700/50 hover:text-white hover:border-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 focus:ring-offset-slate-900 transform hover:scale-105 backdrop-blur-sm">
+                        <svg class="w-5 h-5 mr-2 group-hover:rotate-12 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                        API Docs
+                    </a>
+                </div>
             </div>
 
             <!-- Quick Links -->

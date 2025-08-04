@@ -38,6 +38,10 @@ MURF_BASE_URL = os.getenv("MURF_BASE_URL", "https://api.murf.ai/v1")
 def read_index():
     return FileResponse("../frontend/index.html")
 
+@app.get("/voice-generation")
+def voice_generation_page():
+    return FileResponse("../frontend/voice-generation.html")
+
 @app.get("/nav")
 def navigation_helper():
     """Quick navigation helper with links to all endpoints"""
@@ -100,7 +104,7 @@ async def generate_speech(request: TTSRequest):
         }
         
         headers = {
-            "Authorization": f"Bearer {MURF_API_KEY}",
+            "api-key": MURF_API_KEY,
             "Content-Type": "application/json",
             "Accept": "application/json"
         }
@@ -165,7 +169,7 @@ async def get_available_voices():
     
     try:
         headers = {
-            "Authorization": f"Bearer {MURF_API_KEY}",
+            "api-key": MURF_API_KEY,
             "Accept": "application/json"
         }
         

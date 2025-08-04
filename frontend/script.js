@@ -38,7 +38,100 @@ function showNotification(message, type = 'success') {
         }, 500);
     }, 3000);
 }
-// Enhanced greet function with TTS integration
+
+// Day 3: Generate custom speech from user input
+function generateCustomSpeech() {
+    const textInput = document.getElementById('ttsText');
+    const submitButton = document.getElementById('submitTTS');
+    const audioSection = document.getElementById('audioSection');
+    const audioElement = document.getElementById('ttsAudio');
+    
+    const userText = textInput.value;
+    const trimmedText = userText.trim();
+    
+    if (!trimmedText) {
+        showNotification('⚠️ Please enter some text to convert to speech!', 'error');
+        textInput.focus();
+        return;
+    }
+    
+    // Button loading state
+    const originalButtonText = submitButton.innerHTML;
+    submitButton.innerHTML = `
+        <svg class="animate-spin w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+        </svg>
+        Generating...
+    `;
+    submitButton.disabled = true;
+    
+    // Hide previous audio if any
+    audioSection.classList.add('hidden');
+    
+    fetch('/tts/generate', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            text: userText,
+            voice_id: 'en-US-ken',
+            rate: '0',
+            pitch: '0'
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        submitButton.innerHTML = originalButtonText;
+        submitButton.disabled = false;
+        
+        if (data.success && data.audio_url) {
+            // Show success notification
+            showNotification('🎉 Speech generated successfully! Audio player ready below.', 'success');
+            
+            // Update audio player
+            audioElement.src = data.audio_url;
+            audioSection.classList.remove('hidden');
+            
+            // Scroll to audio player
+            audioSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            
+            // Add some visual flair
+            createParticleEffect();
+            
+            // Auto play the audio after a short delay
+            setTimeout(() => {
+                audioElement.play().catch(error => {
+                    console.log('Auto-play prevented by browser policy');
+                });
+            }, 500);
+            
+        } else {
+            showNotification('⚠️ TTS generation failed. Please try again.', 'error');
+        }
+    })
+    .catch(error => {
+        submitButton.innerHTML = originalButtonText;
+        submitButton.disabled = false;
+        
+        console.error('TTS Error:', error);
+        showNotification('🔧 Network error. Please check your connection and try again.', 'error');
+    });
+}
+
+// Clear text input
+function clearText() {
+    const textInput = document.getElementById('ttsText');
+    const audioSection = document.getElementById('audioSection');
+    
+    textInput.value = '';
+    audioSection.classList.add('hidden');
+    textInput.focus();
+    
+    showNotification('📝 Text cleared!', 'info');
+}
+
+// Enhanced greet function (keeping for backward compatibility)
 function greet() {
     const button = document.querySelector('button[onclick="greet()"]');
     const originalText = button.innerHTML;
