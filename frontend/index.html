@@ -1,7 +1,15 @@
 <!<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale            <!-- Subtitle -->
-            <p class="text-xl md:text-2xl text-slate-300 mb-4 font-light">
+            <p class="text-xl md:text-2xl text-slate-300 mb-4                     <div class="text-center mb-8">
+                        <div class="inline-flex items-center space-x-2 bg-emerald-600/20 px-4 py-2 rounded-full border border-emerald-500/30 mb-4">
+                            <div class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
+                            <span class="text-emerald-300 text-sm font-medium">Day 7: Echo Bot v2 with Voice Transformation</span>
+                        </div>
+                        <p class="text-slate-400 text-lg">
+                            Record your voice and hear it back in a beautiful AI voice! 🎤🎭✨
+                        </p>
+                    </div>t">
                 30 Days Challenge - Day 3
             </p>itle>Voice Agent - Day 2</title>
     <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
@@ -75,9 +83,36 @@
                 box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
             }
         }
+        
+        /* Custom scrollbar for textarea */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(59, 130, 246, 0.5);
+            border-radius: 4px;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: rgba(59, 130, 246, 0.7);
+        }
+        
+        /* Ensure textarea preserves all whitespace */
+        #ttsText {
+            white-space: pre-wrap !important;
+            word-wrap: break-word !important;
+            overflow-wrap: break-word !important;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+        }
     </style>
 </head>
-<body class="gradient-bg min-h-screen overflow-hidden">
+<body class="gradient-bg min-h-screen">
     <!-- Animated Background Elements -->
     <div class="absolute inset-0 overflow-hidden">
         <div class="absolute -top-40 -right-40 w-96 h-96 bg-slate-700/20 rounded-full mix-blend-screen filter blur-3xl opacity-40 animate-float"></div>
@@ -86,8 +121,8 @@
     </div>
 
     <!-- Main Content -->
-    <div class="relative z-10 flex items-center justify-center min-h-screen p-8">
-        <div class="glass-effect rounded-3xl p-8 md:p-12 max-w-2xl w-full text-center shadow-2xl">
+    <div class="relative z-10 flex justify-center min-h-screen p-8 py-16">
+        <div class="glass-effect rounded-3xl p-8 md:p-12 max-w-2xl w-full text-center shadow-2xl my-auto">
             <!-- AI Icon -->
             <div class="flex justify-center mb-8">
                 <div class="relative group">
@@ -108,7 +143,7 @@
             
             <!-- Subtitle -->
             <p class="text-xl md:text-2xl text-slate-300 mb-4 font-light">
-                30 Days Challenge - Day 3
+                30 Days Challenge - Day 4
             </p>
             
             <!-- Navigation Link -->
@@ -124,48 +159,205 @@
             <!-- Day indicator -->
             <div class="mb-8 inline-flex items-center space-x-2 bg-blue-600/20 px-4 py-2 rounded-full border border-blue-500/30">
                 <div class="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></div>
-                <span class="text-blue-300 text-sm font-medium">TTS Audio Playback Integration</span>
+                <span class="text-blue-300 text-sm font-medium">Echo Bot + TTS Integration</span>
             </div>
             
             <!-- Description -->
             <p class="text-slate-400 mb-8 text-lg leading-relaxed max-w-2xl mx-auto">
-                Experience our advanced AI voice technology. Choose from preset messages or create custom speech from any text with natural-sounding voices.
+                Experience our advanced AI voice technology with full-featured controls. The embedded interface below provides complete text-to-speech functionality with voice selection, speed/pitch controls, and audio download capabilities.
             </p>
 
-            <!-- Action Buttons -->
-            <div class="space-y-6">
-                <!-- Main Voice Generation Button -->
-                <div class="text-center">
-                    <a href="/voice-generation" class="inline-flex items-center space-x-3 bg-gradient-to-r from-blue-600 via-purple-600 to-blue-600 hover:from-blue-700 hover:via-purple-700 hover:to-blue-700 text-white font-semibold py-4 px-8 rounded-2xl transition-all duration-300 transform hover:scale-105 shadow-2xl border border-blue-500/30">
-                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M7 4a3 3 0 016 0v4a3 3 0 11-6 0V4zm4 10.93A7.001 7.001 0 0017 8a1 1 0 10-2 0A5 5 0 015 8a1 1 0 00-2 0 7.001 7.001 0 006 6.93V17H6a1 1 0 100 2h8a1 1 0 100-2h-3v-2.07z" clip-rule="evenodd"></path>
-                        </svg>
-                        <span>Create Custom Voice</span>
-                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"></path>
-                        </svg>
-                    </a>
-                    <p class="text-slate-500 text-sm mt-2">Advanced text-to-speech with customizable voices</p>
+            <!-- Voice Generation Section -->
+            <div class="mb-8 max-w-4xl mx-auto">
+                <div class="bg-slate-800/30 backdrop-blur-sm rounded-2xl p-4 border border-slate-600/30">
+                    <div class="text-center mb-4">
+                        <h3 class="text-lg font-semibold text-white flex items-center justify-center">
+                            <svg class="w-5 h-5 mr-2 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path>
+                            </svg>
+                            Advanced Voice Generation
+                        </h3>
+                        <p class="text-slate-400 text-sm mt-1">Full-featured text-to-speech with voice controls</p>
+                    </div>
+                    <iframe 
+                        src="/voice-generation" 
+                        class="w-full h-[700px] rounded-xl border-0 bg-transparent"
+                        title="Voice Generation Interface"
+                        frameborder="0"
+                        scrolling="yes"
+                        sandbox="allow-scripts allow-same-origin allow-forms">
+                        <p class="text-slate-400 p-4 text-center">
+                            Your browser does not support iframes. 
+                            <a href="/voice-generation" class="text-blue-400 hover:text-blue-300 underline">
+                                Click here to access the voice generation page directly.
+                            </a>
+                        </p>
+                    </iframe>
                 </div>
+            </div>
 
-                <!-- Preset Voice Messages -->
-                <div class="grid md:grid-cols-2 gap-4 max-w-2xl mx-auto">
-                    <button 
-                        onclick="greet()" 
-                        class="voice-pulse group relative inline-flex items-center justify-center px-6 py-3 text-base font-semibold text-white transition-all duration-300 bg-gradient-to-r from-green-600 to-emerald-500 rounded-xl hover:from-green-500 hover:to-emerald-400 focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-2 focus:ring-offset-slate-900 transform hover:scale-105 active:scale-95 shadow-lg border border-green-500/30"
-                    >
-                        <svg class="w-5 h-5 mr-2 group-hover:animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 14.142M9 9a3 3 0 000 6v-6a3 3 0 000-6z"></path>
-                        </svg>
-                        Try Demo Voice
-                    </button>
+            <!-- Echo Bot Section - Day 4 -->
+            <div class="mb-8 max-w-4xl mx-auto">
+                <div class="glass-effect rounded-2xl p-8 border border-slate-600/30">
+                    <h1 class="text-3xl md:text-4xl font-bold text-white mb-6 text-center">
+                        <span class="bg-gradient-to-r from-emerald-400 via-cyan-300 to-blue-400 bg-clip-text text-transparent">
+                            Echo Bot
+                        </span>
+                    </h1>
                     
-                    <a href="/docs" target="_blank" class="group inline-flex items-center justify-center px-6 py-3 text-base font-medium text-slate-300 transition-all duration-300 border-2 border-slate-600/60 rounded-xl hover:bg-slate-700/50 hover:text-white hover:border-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 focus:ring-offset-slate-900 transform hover:scale-105 backdrop-blur-sm">
-                        <svg class="w-5 h-5 mr-2 group-hover:rotate-12 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                        </svg>
-                        API Docs
-                    </a>
+                    <div class="text-center mb-8">
+                        <div class="inline-flex items-center space-x-2 bg-emerald-600/20 px-4 py-2 rounded-full border border-emerald-500/30 mb-4">
+                            <div class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
+                            <span class="text-emerald-300 text-sm font-medium">Day 6: Voice Recording, Upload & Transcription</span>
+                        </div>
+                        <p class="text-slate-400 text-lg">
+                            Record your voice, upload it to the server, and get AI-powered transcription! 🎤�
+                        </p>
+                    </div>
+
+                    <!-- Recording Status -->
+                    <div id="recordingStatus" class="text-center mb-6">
+                        <div class="inline-flex items-center space-x-2 text-slate-400">
+                            <svg id="micIcon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path>
+                            </svg>
+                            <span id="statusText">Ready to record</span>
+                        </div>
+                        <div id="recordingTimer" class="text-2xl font-mono text-emerald-400 mt-2 hidden">00:00</div>
+                    </div>
+
+                    <!-- Recording Controls -->
+                    <div class="flex flex-wrap justify-center gap-4 mb-8">
+                        <button 
+                            id="startRecordBtn"
+                            onclick="startRecording()" 
+                            class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white font-medium rounded-xl transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl"
+                        >
+                            <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M7 4a3 3 0 016 0v4a3 3 0 11-6 0V4zm4 10.93A7.001 7.001 0 0017 8a1 1 0 10-2 0A5 5 0 015 8a1 1 0 00-2 0 7.001 7.001 0 006 6.93V17H6a1 1 0 100 2h8a1 1 0 100-2h-3v-2.07z" clip-rule="evenodd"></path>
+                            </svg>
+                            Start Recording
+                        </button>
+                        
+                        <button 
+                            id="stopRecordBtn"
+                            onclick="stopRecording()" 
+                            disabled
+                            class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-700 hover:to-rose-700 text-white font-medium rounded-xl transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                        >
+                            <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8 7a1 1 0 00-1 1v4a1 1 0 001 1h4a1 1 0 001-1V8a1 1 0 00-1-1H8z" clip-rule="evenodd"></path>
+                            </svg>
+                            Stop Recording
+                        </button>
+                        
+                        <button 
+                            id="clearRecordBtn"
+                            onclick="clearRecording()" 
+                            class="inline-flex items-center px-6 py-3 bg-slate-700 hover:bg-slate-600 text-white font-medium rounded-xl transition-all duration-200"
+                        >
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                            </svg>
+                            Clear Recording
+                        </button>
+                    </div>
+
+                    <!-- Audio Playback Section -->
+                    <div id="playbackSection" class="hidden">
+                        <div class="bg-slate-800/40 backdrop-blur-sm rounded-xl p-6 border border-slate-600/30">
+                            <div class="text-center mb-4">
+                                <h3 class="text-white font-medium text-lg mb-2 flex items-center justify-center">
+                                    <svg class="w-5 h-5 mr-2 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                    Your Echo Recording
+                                </h3>
+                                <p class="text-slate-400 text-sm">Listen to your recorded voice!</p>
+                            </div>
+                            
+                            <div class="flex flex-col items-center space-y-4">
+                                <audio id="echoAudio" controls class="w-full max-w-md rounded-lg">
+                                    Your browser does not support the audio element.
+                                </audio>
+                                
+                                <div class="flex space-x-3">
+                                    <button 
+                                        id="playEchoBtn"
+                                        onclick="playEcho()" 
+                                        class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-all duration-200"
+                                    >
+                                        <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"></path>
+                                        </svg>
+                                        Play Echo
+                                    </button>
+                                    
+                                    <a 
+                                        id="downloadEchoBtn"
+                                        href="#" 
+                                        download
+                                        class="inline-flex items-center px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-lg transition-all duration-200"
+                                    >
+                                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                        </svg>
+                                        Download
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Day 6: Transcription Section -->
+                    <div id="transcriptionSection" class="hidden mt-6">
+                        <div class="bg-slate-800/40 backdrop-blur-sm rounded-xl p-6 border border-slate-600/30">
+                            <div class="text-center mb-4">
+                                <h3 class="text-white font-medium text-lg mb-2 flex items-center justify-center">
+                                    <svg class="w-5 h-5 mr-2 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                    </svg>
+                                    Audio Transcription
+                                </h3>
+                                <p class="text-slate-400 text-sm">AI-powered speech-to-text using AssemblyAI</p>
+                            </div>
+                            
+                            <div class="space-y-4">
+                                <!-- Transcription Status -->
+                                <div id="transcriptionStatus" class="text-center">
+                                    <span class="text-slate-400">Ready to transcribe your recording</span>
+                                </div>
+                                
+                                <!-- Transcription Result -->
+                                <div id="transcriptionResult" class="hidden">
+                                    <div class="bg-slate-900/50 rounded-lg p-4 border border-slate-600/30">
+                                        <div class="flex items-start space-x-3 mb-3">
+                                            <svg class="w-5 h-5 text-purple-400 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"></path>
+                                            </svg>
+                                            <h4 class="text-white font-medium">Transcription:</h4>
+                                        </div>
+                                        <p id="transcriptionText" class="text-slate-200 leading-relaxed"></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Browser Compatibility Notice -->
+                    <div class="mt-6 p-4 bg-blue-900/20 border border-blue-500/30 rounded-lg">
+                        <div class="flex items-start space-x-3">
+                            <svg class="w-5 h-5 text-blue-400 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            <div>
+                                <p class="text-blue-300 text-sm font-medium">Microphone Access Required</p>
+                                <p class="text-blue-200/80 text-xs mt-1">
+                                    Your browser will ask for microphone permission. This is needed to record your voice for the echo bot functionality.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
