@@ -1,5 +1,43 @@
 // Voice Agent JavaScript with Enhanced Interactions
 
+// Day 10: Session Management
+let currentSessionId = null;
+let chatHistory = [];
+let autoRecordAfterResponse = false;
+
+// Initialize session ID from URL params or generate new one
+function initializeSession() {
+    const urlParams = new URLSearchParams(window.location.search);
+    currentSessionId = urlParams.get('session_id');
+    
+    if (!currentSessionId) {
+        // Generate new session ID
+        currentSessionId = 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        
+        // Update URL with session ID
+        const newUrl = new URL(window.location);
+        newUrl.searchParams.set('session_id', currentSessionId);
+        window.history.replaceState({}, '', newUrl);
+    }
+    
+    updateSessionDisplay();
+    return currentSessionId;
+}
+
+// Update session display
+function updateSessionDisplay() {
+    const sessionIdElement = document.getElementById('sessionId');
+    const messageCountElement = document.getElementById('messageCount');
+    
+    if (sessionIdElement) {
+        sessionIdElement.textContent = currentSessionId || 'No session';
+    }
+    
+    if (messageCountElement) {
+        messageCountElement.textContent = `${chatHistory.length} messages`;
+    }
+}
+
 // Modern notification system with updated colors
 function showNotification(message, type = 'success') {
     const notification = document.createElement('div');
@@ -559,6 +597,7 @@ let audioChunks = [];
 let recordingTimer;
 let recordingStartTime;
 let recordingStream;
+let isRecording = false;
 
 // Initialize Echo Bot when page loads
 document.addEventListener('DOMContentLoaded', function() {
@@ -689,10 +728,10 @@ async function startRecording() {
                 recordingStream.getTracks().forEach(track => track.stop());
             }
             
-            showNotification('🎤 Recording saved! Processing with AI voice...', 'success');
+            showNotification('🎤 Recording saved! Processing through AI pipeline...', 'success');
             
-            // Process with Echo Bot v2
-            processEchoBotV2(audioBlob);
+            // DAY 9: Process with Full LLM Pipeline (Audio → Transcription → LLM → TTS)
+            processLLMPipeline(audioBlob);
         };
         
         mediaRecorder.onerror = (event) => {
@@ -702,6 +741,8 @@ async function startRecording() {
         
         console.log('Step 6: Starting recording...');
         mediaRecorder.start();
+        isRecording = true;
+        updateMainRecordButton();
         
         console.log('Step 7: Updating UI...');
         recordingStartTime = Date.now();
@@ -743,6 +784,8 @@ function stopRecording() {
     
     if (mediaRecorder && mediaRecorder.state === 'recording') {
         mediaRecorder.stop();
+        isRecording = false;
+        updateMainRecordButton();
         
         // Update UI
         updateRecordingUI(false);
@@ -857,6 +900,31 @@ function updateEchoBotStatus(message, isRecording = false) {
             micIcon.classList.remove('text-red-500', 'animate-pulse');
             micIcon.classList.add('text-slate-400');
         }
+    }
+}
+
+// Update processing step indicator
+function updateProcessingStep(stepNumber, status) {
+    const stepElement = document.getElementById(`step${stepNumber}`);
+    if (!stepElement) return;
+    
+    // Get the step indicator (the colored dot)
+    const stepIndicator = stepElement.querySelector('.w-2.h-2');
+    if (!stepIndicator) return;
+    
+    // Update the step appearance based on status
+    if (status === 'active') {
+        stepElement.classList.remove('text-gray-400');
+        stepElement.classList.add('text-blue-400');
+        stepIndicator.className = 'w-2 h-2 rounded-full bg-blue-400 animate-pulse';
+    } else if (status === 'complete') {
+        stepElement.classList.remove('text-gray-400');
+        stepElement.classList.add('text-green-400');
+        stepIndicator.className = 'w-2 h-2 rounded-full bg-green-400';
+    } else {
+        stepElement.classList.remove('text-blue-400', 'text-green-400');
+        stepElement.classList.add('text-gray-400');
+        stepIndicator.className = 'w-2 h-2 rounded-full bg-gray-500';
     }
 }
 
@@ -1083,7 +1151,7 @@ async function processEchoBotV2(audioBlob) {
             
             // Play TTS audio
             if (data.audio_url) {
-                updateEchoBotStatus('✅ AI voice ready! Playing back...');
+                updateEchoBotStatus('🔊 Playing AI response...');
                 
                 // Set audio source and play
                 audioPlayback.src = data.audio_url;
@@ -1133,41 +1201,497 @@ async function processEchoBotV2(audioBlob) {
     }
 }
 
-// Keyboard shortcuts for Echo Bot
-document.addEventListener('keydown', function(event) {
-    // Space bar to start/stop recording (when not focused on input)
-    if (event.code === 'Space' && event.target.tagName !== 'INPUT' && event.target.tagName !== 'TEXTAREA') {
-        event.preventDefault();
-        
-        if (mediaRecorder && mediaRecorder.state === 'recording') {
-            stopRecording();
-        } else {
-            startRecording();
+// Day 10: Process audio with Conversational LLM Pipeline (Audio → Transcription → LLM with Chat History → TTS)
+async function processLLMPipeline(audioBlob) {
+    const resultsContainer = document.getElementById('resultsContainer');
+    const audioPlayback = document.getElementById('responseAudio');
+    const transcriptionText = document.getElementById('transcriptionText');
+    const llmResponseText = document.getElementById('llmResponseText');
+    const audioPlayerContainer = document.getElementById('audioPlayerContainer');
+    const processingStatus = document.getElementById('processingStatus');
+    
+    console.log('processLLMPipeline - Elements found:', {
+        resultsContainer: !!resultsContainer,
+        audioPlayback: !!audioPlayback,
+        transcriptionText: !!transcriptionText,
+        llmResponseText: !!llmResponseText,
+        audioPlayerContainer: !!audioPlayerContainer,
+        sessionId: currentSessionId
+    });
+    
+    try {
+        if (!currentSessionId) {
+            console.error('No session ID available');
+            currentSessionId = initializeSession();
         }
+        
+        console.log('processLLMPipeline - Session ID:', currentSessionId);
+        
+        updateEchoBotStatus('🎙️ Transcribing your question...');
+        if (processingStatus) {
+            processingStatus.classList.remove('hidden');
+            updateProcessingStep(1, 'active');
+        }
+        
+        const formData = new FormData();
+        formData.append('file', audioBlob, 'recording.webm');
+        formData.append('model', 'gemini-1.5-flash');
+        
+        showNotification('💬 Processing conversational AI: Speech → Memory → LLM → Speech...', 'info');
+        updateProcessingStep(2, 'active');
+        
+        const response = await fetch(`/agent/chat/${currentSessionId}`, {
+            method: 'POST',
+            body: formData
+        });
+        
+        if (response.ok) {
+            updateProcessingStep(3, 'active');
+            updateEchoBotStatus('🧠 AI is thinking with conversation context...');
+            
+            const data = await response.json();
+
+            // Day 11: backend may send success=false with fallback text
+            if (data && data.success === false) {
+                const friendly = data.response || "I'm having trouble connecting right now. Please try again.";
+                if (resultsContainer) resultsContainer.classList.remove('hidden');
+                if (transcriptionText && data.transcription) transcriptionText.textContent = data.transcription;
+                if (llmResponseText) llmResponseText.textContent = friendly;
+                if (!data.audio_url) {
+                    speakClientFallback(friendly);
+                    updateEchoBotStatus('⚠️ Using fallback response');
+                    showNotification('Using a fallback response due to an error', 'info');
+                }
+                if (processingStatus) {
+                    setTimeout(() => {
+                        processingStatus.classList.add('hidden');
+                        for (let i = 1; i <= 4; i++) updateProcessingStep(i, 'waiting');
+                    }, 1500);
+                }
+                return;
+            }
+            
+            if (data.chat_history) {
+                chatHistory = data.chat_history;
+                updateSessionDisplay();
+            }
+            if (data.transcription && transcriptionText) {
+                transcriptionText.textContent = data.transcription;
+            }
+            if (data.response && llmResponseText) {
+                llmResponseText.textContent = data.response;
+            }
+            if (resultsContainer) {
+                resultsContainer.classList.remove('hidden');
+            }
+            
+            if (data.audio_url && audioPlayback && audioPlayerContainer) {
+                updateProcessingStep(4, 'active');
+                updateEchoBotStatus('🔊 Playing AI response...');
+                
+                audioPlayback.src = data.audio_url;
+                audioPlayback.load();
+                audioPlayerContainer.classList.remove('hidden');
+                
+                audioPlayback.onloadeddata = () => {
+                    audioPlayback.play().catch(playError => {
+                        console.error('Audio playback error:', playError);
+                        showNotification('AI response generated but playback failed. Check your browser settings.', 'warning');
+                        updateEchoBotStatus('✅ AI response ready! Click play to listen.');
+                    });
+                };
+                
+                audioPlayback.onplay = () => {
+                    showNotification('🎉 Conversational AI complete! Having a conversation...', 'success');
+                };
+                
+                audioPlayback.onended = () => {
+                    updateEchoBotStatus('✅ Ready for your next message...');
+                    showNotification('🎤 Ready to continue conversation - speak now!', 'info');
+                    if (processingStatus) {
+                        setTimeout(() => {
+                            processingStatus.classList.add('hidden');
+                            for (let i = 1; i <= 4; i++) {
+                                updateProcessingStep(i, 'waiting');
+                            }
+                        }, 2000);
+                    }
+                    setTimeout(() => {
+                        if (autoRecordAfterResponse) {
+                            startRecording();
+                            showNotification('🎙️ Auto-started recording for conversation...', 'info');
+                        }
+                    }, 1500);
+                };
+                
+                audioPlayback.onerror = () => {
+                    showNotification('⚠️ Error playing audio', 'error');
+                    updateEchoBotStatus('❌ Audio playback failed');
+                };
+                
+                if (resultsContainer) {
+                    resultsContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            } else {
+                // TTS unavailable – use Web Speech API as fallback
+                if (data.response) {
+                    speakClientFallback(data.response);
+                    updateProcessingStep(4, 'complete');
+                    updateEchoBotStatus('✅ Using fallback speech on device');
+                    showNotification('🎤 Speaking with on-device voice (fallback)', 'info');
+                } else {
+                    throw new Error('No audio URL and no response text received from conversational AI');
+                }
+            }
+        } else {
+            const errorData = await response.json();
+            console.error('Conversational AI processing failed:', errorData);
+            console.error('Response status:', response.status);
+            console.error('Response statusText:', response.statusText);
+            throw new Error(errorData.detail || errorData.message || `Chat error: ${response.status} ${response.statusText}`);
+        }
+    } catch (error) {
+        console.error('Conversational AI error:', error);
+        console.error('Error type:', typeof error);
+        console.error('Error message:', error.message);
+        console.error('Full error object:', error);
+        let errorMessage = 'Conversational AI failed';
+        if (error.message && error.message !== '[object Object]') {
+            errorMessage += `: ${error.message}`;
+        }
+        showNotification(`❌ ${errorMessage}`, 'error');
+        updateEchoBotStatus(`❌ Conversation failed: ${error.message || 'Unknown error'}`);
+        // Last resort: generic fallback speech
+        speakClientFallback("I'm having trouble connecting right now. Please try again in a moment.");
+    }
+}
+
+// Day 11: Client-side speech synthesis fallback
+function speakClientFallback(text) {
+    try {
+        if (!('speechSynthesis' in window)) return;
+        const utter = new SpeechSynthesisUtterance(text);
+        utter.lang = 'en-US';
+        utter.rate = 1.0;
+        utter.pitch = 1.0;
+        window.speechSynthesis.cancel();
+        window.speechSynthesis.speak(utter);
+    } catch (e) {
+        console.log('Speech synthesis not available:', e);
+    }
+}
+
+// Day 12: Enhanced UI - Single Toggle Button Recording
+let currentState = 'idle'; // 'idle', 'recording', 'processing'
+let recordingTimer = null;
+let recordingSeconds = 0;
+
+// Initialize the new UI when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('Initializing enhanced UI...');
+    
+    // Initialize session
+    initializeSession();
+    
+    // Setup record button
+    const recordBtn = document.getElementById('recordBtn');
+    if (recordBtn) {
+        recordBtn.addEventListener('click', toggleRecording);
+        console.log('Record button event listener attached');
     }
     
-    // Escape to clear recording
-    if (event.code === 'Escape') {
-        clearRecording();
-    }
+    // Initialize UI state
+    updateUIState('idle');
 });
 
-// Check browser compatibility on load
-document.addEventListener('DOMContentLoaded', function() {
-    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-        showNotification('❌ Your browser does not support audio recording. Please use a modern browser.', 'error');
-        
-        // Disable recording buttons
-        const startBtn = document.getElementById('startRecordBtn');
-        const stopBtn = document.getElementById('stopRecordBtn');
-        
-        if (startBtn) {
-            startBtn.disabled = true;
-            startBtn.textContent = 'Not Supported';
-        }
-        
-        if (stopBtn) {
-            stopBtn.disabled = true;
-        }
+// Toggle recording function for the single button
+function toggleRecording() {
+    console.log('Toggle recording called, current state:', currentState);
+    
+    if (currentState === 'idle') {
+        startEnhancedRecording();
+    } else if (currentState === 'recording') {
+        stopEnhancedRecording();
     }
-});
+    // If processing, button should be disabled
+}
+
+// Enhanced recording start with animations
+async function startEnhancedRecording() {
+    console.log('Starting enhanced recording...');
+    
+    try {
+        // Request microphone permission
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        
+        // Update UI to recording state
+        updateUIState('recording');
+        
+        // Start recording timer
+        startRecordingTimer();
+        
+        // Initialize MediaRecorder
+        mediaRecorder = new MediaRecorder(stream);
+        audioChunks = [];
+        
+        mediaRecorder.ondataavailable = event => {
+            audioChunks.push(event.data);
+        };
+        
+        mediaRecorder.onstop = async () => {
+            console.log('Recording stopped, processing...');
+            
+            // Update UI to processing state
+            updateUIState('processing');
+            
+            // Create audio blob and process
+            const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+            await processLLMPipeline(audioBlob);
+        };
+        
+        mediaRecorder.start();
+        console.log('MediaRecorder started');
+        
+    } catch (error) {
+        console.error('Error starting recording:', error);
+        showNotification('❌ Could not access microphone', 'error');
+        updateUIState('idle');
+    }
+}
+
+// Enhanced recording stop
+function stopEnhancedRecording() {
+    console.log('Stopping enhanced recording...');
+    
+    if (mediaRecorder && mediaRecorder.state === 'recording') {
+        mediaRecorder.stop();
+        
+        // Stop all tracks to release microphone
+        mediaRecorder.stream.getTracks().forEach(track => track.stop());
+    }
+    
+    // Stop timer
+    stopRecordingTimer();
+}
+
+// Update UI state with animations
+function updateUIState(state) {
+    console.log('Updating UI state to:', state);
+    currentState = state;
+    
+    const recordBtn = document.getElementById('recordBtn');
+    const statusText = document.getElementById('statusText');
+    const statusIcon = document.getElementById('statusIcon');
+    const recordIcon = document.getElementById('recordIcon');
+    const recordBtnText = document.getElementById('recordBtnText');
+    const audioWave = document.getElementById('audioWave');
+    const processingStatus = document.getElementById('processingStatus');
+    const recordingTimer = document.getElementById('recordingTimer');
+    
+    // Reset all states
+    recordBtn.className = 'record-button w-32 h-32 rounded-full font-bold text-xl text-white transition-all duration-300 transform hover:scale-110 shadow-2xl';
+    audioWave.classList.add('hidden');
+    processingStatus.classList.add('hidden');
+    recordingTimer.classList.add('hidden');
+    
+    switch (state) {
+        case 'idle':
+            recordBtn.classList.add('idle-state', 'animate-glow');
+            recordBtn.disabled = false;
+            statusText.textContent = 'Ready to listen';
+            recordBtnText.textContent = 'TAP TO TALK';
+            statusIcon.innerHTML = `
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path>
+                </svg>
+            `;
+            break;
+            
+        case 'recording':
+            recordBtn.classList.add('recording-state', 'animate-recording-pulse');
+            recordBtn.disabled = false;
+            statusText.textContent = 'Recording... Tap to stop';
+            recordBtnText.textContent = 'RECORDING';
+            recordingTimer.classList.remove('hidden');
+            audioWave.classList.remove('hidden');
+            statusIcon.innerHTML = `
+                <svg fill="currentColor" viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="3"/>
+                </svg>
+            `;
+            recordIcon.innerHTML = `
+                <svg fill="currentColor" viewBox="0 0 24 24">
+                    <rect x="6" y="6" width="12" height="12" rx="2"/>
+                </svg>
+            `;
+            break;
+            
+        case 'processing':
+            recordBtn.classList.add('processing-state', 'animate-pulse');
+            recordBtn.disabled = true;
+            statusText.textContent = 'Processing your request...';
+            recordBtnText.textContent = 'PROCESSING';
+            processingStatus.classList.remove('hidden');
+            statusIcon.innerHTML = `
+                <svg class="animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                </svg>
+            `;
+            recordIcon.innerHTML = `
+                <svg class="animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                </svg>
+            `;
+            break;
+    }
+}
+
+// Recording timer functions
+function startRecordingTimer() {
+    recordingSeconds = 0;
+    recordingTimer = setInterval(() => {
+        recordingSeconds++;
+        const minutes = Math.floor(recordingSeconds / 60);
+        const seconds = recordingSeconds % 60;
+        const timerElement = document.getElementById('timer');
+        if (timerElement) {
+            timerElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+    }, 1000);
+}
+
+function stopRecordingTimer() {
+    if (recordingTimer) {
+        clearInterval(recordingTimer);
+        recordingTimer = null;
+    }
+}
+
+// Update processing steps with enhanced animations
+function updateProcessingStep(stepNumber, status = 'active') {
+    const step = document.getElementById(`step${stepNumber}`);
+    if (!step) return;
+    
+    const dot = step.querySelector('.w-2, .w-3');
+    const text = step.querySelector('span');
+    
+    if (status === 'active') {
+        step.className = 'flex items-center justify-center space-x-3 text-blue-400 transition-all duration-300';
+        dot.className = 'w-3 h-3 rounded-full bg-blue-400 animate-pulse';
+        text.classList.add('font-medium');
+    } else if (status === 'complete') {
+        step.className = 'flex items-center justify-center space-x-3 text-green-400 transition-all duration-300';
+        dot.className = 'w-3 h-3 rounded-full bg-green-400';
+        text.classList.add('font-medium');
+        // Add checkmark
+        dot.innerHTML = '✓';
+        dot.className = 'w-3 h-3 rounded-full bg-green-400 text-white text-xs flex items-center justify-center';
+    } else {
+        step.className = 'flex items-center justify-center space-x-3 text-gray-400 transition-all duration-300';
+        dot.className = 'w-3 h-3 rounded-full bg-gray-500';
+        text.classList.remove('font-medium');
+    }
+}
+
+// Enhanced process LLM pipeline with better UI feedback
+async function processLLMPipeline(audioBlob) {
+    console.log('Processing LLM pipeline with enhanced UI...');
+    
+    try {
+        // Step 1: Upload audio
+        updateProcessingStep(1, 'active');
+        await new Promise(resolve => setTimeout(resolve, 500)); // Visual delay
+        
+        const formData = new FormData();
+        formData.append('audio', audioBlob, 'recording.wav');
+        
+        updateProcessingStep(1, 'complete');
+        updateProcessingStep(2, 'active');
+        
+        // Make the API call
+        const response = await fetch(`/agent/chat/${currentSessionId}`, {
+            method: 'POST',
+            body: formData
+        });
+        
+        updateProcessingStep(2, 'complete');
+        updateProcessingStep(3, 'active');
+        
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        
+        const data = await response.json();
+        
+        updateProcessingStep(3, 'complete');
+        updateProcessingStep(4, 'active');
+        
+        if (data.success) {
+            // Display results
+            displayConversationResults(data);
+            
+            // Play audio if available
+            if (data.audio_url) {
+                const audio = document.getElementById('responseAudio');
+                audio.src = data.audio_url;
+                audio.play().catch(console.error);
+            } else {
+                // Fallback to client speech
+                speakClientFallback(data.response);
+            }
+            
+            updateProcessingStep(4, 'complete');
+            
+            // Auto-continue if enabled
+            setTimeout(() => {
+                const autoRecord = document.getElementById('autoRecordToggle');
+                if (autoRecord && autoRecord.checked) {
+                    updateUIState('idle');
+                    setTimeout(() => {
+                        startEnhancedRecording();
+                    }, 1000);
+                } else {
+                    updateUIState('idle');
+                }
+            }, 2000);
+            
+        } else {
+            throw new Error(data.message || 'Processing failed');
+        }
+        
+    } catch (error) {
+        console.error('Pipeline error:', error);
+        showNotification(`❌ ${error.message}`, 'error');
+        updateUIState('idle');
+    }
+}
+
+// Display conversation results with enhanced styling
+function displayConversationResults(data) {
+    const resultsContainer = document.getElementById('resultsContainer');
+    const transcriptionText = document.getElementById('transcriptionText');
+    const llmResponseText = document.getElementById('llmResponseText');
+    
+    if (transcriptionText) transcriptionText.textContent = data.transcription || 'No transcription available';
+    if (llmResponseText) llmResponseText.textContent = data.response || 'No response available';
+    
+    if (resultsContainer) {
+        resultsContainer.classList.remove('hidden');
+        
+        // Smooth scroll to results
+        setTimeout(() => {
+            resultsContainer.scrollIntoView({ 
+                behavior: 'smooth', 
+                block: 'nearest' 
+            });
+        }, 500);
+    }
+    
+    // Update session info
+    updateSessionDisplay();
+    chatHistory.push({
+        user: data.transcription,
+        assistant: data.response,
+        timestamp: new Date().toISOString()
+    });
+}
