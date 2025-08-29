@@ -13,6 +13,14 @@ document.addEventListener("DOMContentLoaded", () => {
     
     // NEW: Keep a reference to the current audio source to stop it gracefully
     let currentAudioSource = null; 
+    
+    // API Keys storage
+    let apiKeys = {
+        gemini: '',
+        assemblyai: '',
+        murf: '',
+        tavily: ''
+    };
 
     const recordBtn = document.getElementById("recordBtn");
     // Persona/voice dropdown removed; always use Lelouch persona
@@ -21,6 +29,16 @@ document.addEventListener("DOMContentLoaded", () => {
     const chatContainer = document.getElementById("chatContainer");
     const clearBtnContainer = document.getElementById("clearBtnContainer");
     const clearBtn = document.getElementById("clearBtn");
+    
+    // API Modal elements
+    const apiModal = document.getElementById("apiModal");
+    const configBtn = document.getElementById("configBtn");
+    const saveKeysBtn = document.getElementById("saveKeys");
+    const cancelKeysBtn = document.getElementById("cancelKeys");
+    const geminiKeyInput = document.getElementById("geminiKey");
+    const assemblyaiKeyInput = document.getElementById("assemblyaiKey");
+    const murfKeyInput = document.getElementById("murfKey");
+    const tavilyKeyInput = document.getElementById("tavilyKey");
 
     // MODIFIED: This function now stops the specific sound source instead of destroying the context.
     const stopCurrentPlayback = () => {
@@ -67,6 +85,61 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         );
     };
+
+    // API Key Management
+    const showApiModal = () => {
+        apiModal.classList.remove("hidden");
+        // Load existing keys
+        geminiKeyInput.value = apiKeys.gemini;
+        assemblyaiKeyInput.value = apiKeys.assemblyai;
+        murfKeyInput.value = apiKeys.murf;
+        tavilyKeyInput.value = apiKeys.tavily;
+    };
+    
+    const hideApiModal = () => {
+        apiModal.classList.add("hidden");
+    };
+    
+    const saveApiKeys = () => {
+        apiKeys.gemini = geminiKeyInput.value.trim();
+        apiKeys.assemblyai = assemblyaiKeyInput.value.trim();
+        apiKeys.murf = murfKeyInput.value.trim();
+        apiKeys.tavily = tavilyKeyInput.value.trim();
+        
+        // Check if required keys are provided
+        if (!apiKeys.gemini || !apiKeys.assemblyai || !apiKeys.murf) {
+            alert("Please provide at least Gemini, AssemblyAI, and Murf API keys to continue.");
+            return;
+        }
+        
+        // Enable the record button
+        recordBtn.disabled = false;
+        statusDisplay.textContent = "Ready";
+        hideApiModal();
+        
+        // Store keys in sessionStorage for this session
+        sessionStorage.setItem('apiKeys', JSON.stringify(apiKeys));
+    };
+    
+    // Load API keys from sessionStorage if available
+    const loadStoredKeys = () => {
+        const stored = sessionStorage.getItem('apiKeys');
+        if (stored) {
+            apiKeys = JSON.parse(stored);
+            if (apiKeys.gemini && apiKeys.assemblyai && apiKeys.murf) {
+                recordBtn.disabled = false;
+                statusDisplay.textContent = "Ready";
+            }
+        }
+    };
+    
+    // Event listeners for API modal
+    configBtn.addEventListener("click", showApiModal);
+    saveKeysBtn.addEventListener("click", saveApiKeys);
+    cancelKeysBtn.addEventListener("click", hideApiModal);
+    
+    // Load stored keys on page load
+    loadStoredKeys();
 
     const cleanupResources = () => {
         console.log("🧹 Cleaning up all resources...");
@@ -165,6 +238,12 @@ document.addEventListener("DOMContentLoaded", () => {
             socket.onopen = async () => {
                 clearTimeout(connectionTimeout);
                 console.log("🔌 WebSocket connection established successfully!");
+                
+                // Send API keys to server
+                socket.send(JSON.stringify({
+                    type: "api_keys",
+                    keys: apiKeys
+                }));
                 
                 // Set up heartbeat
                 heartbeatInterval = setInterval(() => {
@@ -385,16 +464,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const updateUIForRecording = (isRec) => {
         if (isRec) {
-            recordBtn.classList.add("recording", "bg-red-600", "hover:bg-red-700");
-            recordBtn.classList.remove("bg-violet-600", "hover:bg-violet-700");
+            recordBtn.classList.add("recording");
+            recordBtn.style.backgroundColor = "#393E46";
             statusDisplay.textContent = "Connecting...";
             chatDisplay.classList.remove("hidden");
             clearBtnContainer.classList.add("hidden");
         } else {
-            recordBtn.classList.remove("recording", "bg-red-600", "hover:bg-red-700");
-            recordBtn.classList.add("bg-violet-600", "hover:bg-violet-700");
+            recordBtn.classList.remove("recording");
+            recordBtn.style.backgroundColor = "#00ADB5";
             statusDisplay.textContent = "Ready";
-            statusDisplay.classList.remove("text-red-400");
+            statusDisplay.style.color = "#EEEEEE";
         }
     };
 
@@ -408,12 +487,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (sender === 'user') {
             prefixSpan.className = 'user-prefix';
+            prefixSpan.style.color = '#00ADB5';
             prefixSpan.textContent = 'You: ';
             contentSpan.textContent = text;
+            contentSpan.style.color = '#EEEEEE';
         } else {
             prefixSpan.className = 'ai-prefix';
+            prefixSpan.style.color = '#00ADB5';
             prefixSpan.textContent = 'Lelouch AI: ';
             contentSpan.className += ' markdown-content';
+            contentSpan.style.color = '#EEEEEE';
             if (text) {
                 contentSpan.innerHTML = marked.parse(text);
             }
@@ -437,6 +520,11 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     recordBtn.addEventListener("click", () => {
+        if (recordBtn.disabled) {
+            showApiModal();
+            return;
+        }
+        
         if (isRecording) {
             console.log("🛑 Stopping current recording session...");
             stopRecording();

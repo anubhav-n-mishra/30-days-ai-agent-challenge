@@ -28,6 +28,9 @@ from assemblyai.streaming.v3 import (
 )
 import google.generativeai as genai
 
+# Global variables to store user API keys
+user_api_keys = {}
+
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 app = FastAPI()
 
@@ -35,20 +38,41 @@ BASE_DIR = PathLib(__file__).resolve().parent
 app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
 
-# Initialize Tavily client for web search
+# Initialize clients with user API keys (will be set when user provides keys)
 tavily_client = None
-# Use the working API key directly for now
-working_tavily_key = "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"
-if working_tavily_key or config.TAVILY_API_KEY:
-    try:
-        # Try the working key first, fallback to config
-        api_key = working_tavily_key if working_tavily_key else config.TAVILY_API_KEY
-        tavily_client = TavilyClient(api_key=api_key)
-        logging.info("✅ Tavily client initialized successfully with working API key.")
-    except Exception as e:
-        logging.warning(f"Failed to initialize Tavily client: {e}")
-else:
-    logging.warning("Tavily API key not found. Web search functionality will be disabled.")
+gemini_model = None
+
+def initialize_clients_with_keys(api_keys):
+    """Initialize API clients with user-provided keys"""
+    global tavily_client, gemini_model
+    
+    logging.info("Initializing AI clients with user API keys...")
+    
+    # Initialize Tavily client
+    if api_keys.get('tavily'):
+        try:
+            tavily_client = TavilyClient(api_key=api_keys['tavily'])
+            logging.info("✅ Tavily client initialized with user API key.")
+        except Exception as e:
+            logging.warning(f"Failed to initialize Tavily client: {e}")
+    else:
+        logging.info("No Tavily API key provided - web search will be disabled")
+    
+    # Initialize Gemini model
+    if api_keys.get('gemini'):
+        try:
+            logging.info("Configuring Gemini API...")
+            genai.configure(api_key=api_keys['gemini'])
+            
+            # Initialize simple Gemini model first
+            gemini_model = genai.GenerativeModel('gemini-1.5-flash')
+            logging.info("✅ Gemini model initialized with user API key.")
+        except Exception as e:
+            logging.error(f"Failed to initialize Gemini model: {e}")
+            raise e
+    else:
+        logging.error("No Gemini API key provided!")
+        raise ValueError("Gemini API key is required")
 
 # Define search function for Gemini function calling
 def search_web(query: str) -> str:
@@ -73,49 +97,31 @@ def search_web(query: str) -> str:
         logging.error(f"Web search error: {e}")
         return "I encountered an issue accessing my intelligence network. My strategic database remains at your service for other inquiries."
 
-# Configure Gemini with function calling capabilities
-if config.GEMINI_API_KEY:
-    genai.configure(api_key=config.GEMINI_API_KEY)
-    
-    # Define the search function schema for Gemini (updated format)
-    search_function_declaration = genai.protos.FunctionDeclaration(
-        name="search_web",
-        description="Search the web for current information, news, weather, or any topic that requires up-to-date data",
-        parameters=genai.protos.Schema(
-            type=genai.protos.Type.OBJECT,
-            properties={
-                "query": genai.protos.Schema(
-                    type=genai.protos.Type.STRING,
-                    description="The search query to look up on the web"
-                )
-            },
-            required=["query"]
-        )
-    )
-    
-    # Initialize Gemini model with function calling
-    search_tool = genai.protos.Tool(function_declarations=[search_function_declaration])
-    gemini_model = genai.GenerativeModel(
-        'gemini-1.5-flash',
-        tools=[search_tool]
-    )
-    logging.info("Gemini model initialized with web search capability.")
-else:
-    gemini_model = None
-    logging.warning("Gemini model not initialized. GEMINI_API_KEY is missing.")
+# Gemini model will be initialized when user provides API keys
 
 
 async def get_llm_response_stream(transcript: str, client_websocket: WebSocket, chat_history: List[dict]):
+    global user_api_keys, gemini_model
+    
     if not transcript or not transcript.strip():
         return
 
     if not gemini_model:
         logging.error("Cannot get LLM response because Gemini model is not initialized.")
+        await client_websocket.send_text(json.dumps({"type": "llm_chunk", "data": "I apologize, but my AI model is not properly initialized. Please check your API keys."}))
         return
 
     logging.info(f"Sending to Gemini with history: '{transcript}'")
+    logging.info(f"Gemini model status: {gemini_model is not None}")
+    logging.info(f"User API keys available: {list(user_api_keys.keys()) if user_api_keys else 'None'}")
     
-    murf_uri = f"wss://api.murf.ai/v1/speech/stream-input?api-key={config.MURF_API_KEY}&sample_rate=44100&channel_type=MONO&format=MP3"
+    murf_api_key = user_api_keys.get('murf', '')
+    if not murf_api_key:
+        logging.error("Murf API key not provided")
+        await client_websocket.send_text(json.dumps({"type": "llm_chunk", "data": "I apologize, but the text-to-speech service is not configured properly."}))
+        return
+    
+    murf_uri = f"wss://api.murf.ai/v1/speech/stream-input?api-key={murf_api_key}&sample_rate=44100&channel_type=MONO&format=MP3"
 
     # Enhanced Lelouch persona with web search capability
     voice_id = "en-US-william"
@@ -180,72 +186,11 @@ async def get_llm_response_stream(transcript: str, client_websocket: WebSocket, 
 
                 def generate_with_function_calling():
                     try:
-                        # Check if the query requires web search
-                        search_keywords = ['weather', 'news', 'current', 'latest', 'today', 'recent', 'now', 'happening']
-                        should_search = any(keyword in transcript.lower() for keyword in search_keywords)
-                        
-                        if should_search:
-                            logging.info(f"🔍 Query contains search keywords, forcing web search for: {transcript}")
-                            # Directly perform search and then ask Gemini to respond with the results
-                            search_results = search_web(transcript)
-                            logging.info(f"📊 Search completed: {search_results[:100]}...")
-                            
-                            # Create a prompt that includes the search results
-                            enhanced_prompt = (
-                                f"You are Lelouch vi Britannia. The user asked: '{transcript}'\n"
-                                f"Your strategic intelligence network has gathered this information:\n{search_results}\n\n"
-                                f"Present this information as Lelouch would, referring to your 'strategic intelligence network' "
-                                f"or 'intelligence sources'. Be formal and strategic in your response."
-                            )
-                            
-                            response = chat.send_message(enhanced_prompt, stream=True)
-                            return response
-                        else:
-                            # For non-search queries, use regular function calling approach
-                            response = chat.send_message(persona_prompt)
-                            
-                            # Debug: Print response structure
-                            logging.info(f"🔍 Response candidates: {len(response.candidates) if response.candidates else 0}")
-                            if response.candidates and response.candidates[0].content.parts:
-                                logging.info(f"🔍 Parts in response: {len(response.candidates[0].content.parts)}")
-                                for i, part in enumerate(response.candidates[0].content.parts):
-                                    logging.info(f"🔍 Part {i}: has_function_call={hasattr(part, 'function_call')}")
-                                    if hasattr(part, 'function_call') and part.function_call:
-                                        logging.info(f"🔍 Function call detected: {part.function_call.name}")
-                            
-                            # Check if function calling is needed
-                            if response.candidates and response.candidates[0].content.parts:
-                                for part in response.candidates[0].content.parts:
-                                    if hasattr(part, 'function_call') and part.function_call:
-                                        function_call = part.function_call
-                                        if function_call.name == "search_web":
-                                            query = function_call.args.get("query", "")
-                                            logging.info(f"🔍 Lelouch is searching the web for: {query}")
-                                            
-                                            # Execute the search
-                                            search_results = search_web(query)
-                                            logging.info(f"📊 Search results obtained: {search_results[:100]}...")
-                                            
-                                            # Create proper function response
-                                            function_response = genai.protos.Part(
-                                                function_response=genai.protos.FunctionResponse(
-                                                    name="search_web",
-                                                    response={"result": search_results}
-                                                )
-                                            )
-                                            
-                                            # Get the final response with search results
-                                            logging.info("🧠 Sending search results back to Lelouch...")
-                                            final_response = chat.send_message([function_response], stream=True)
-                                            return final_response
-                            
-                            # If no function calling detected, return the original response as stream
-                            logging.info("ℹ️ No function calling detected, using direct response")
-                            return response
-                        
+                        logging.info("Starting Gemini response generation...")
+                        response = chat.send_message(persona_prompt, stream=True)
+                        return response
                     except Exception as e:
-                        logging.error(f"❌ Error in function calling: {e}")
-                        # Fallback to regular response without function calling
+                        logging.error(f"Error in generation: {e}")
                         return chat.send_message(persona_prompt, stream=True)
 
                 loop = asyncio.get_running_loop()
@@ -365,14 +310,10 @@ async def websocket_audio_streaming(websocket: WebSocket):
     llm_task = None
     last_processed_transcript = ""
     chat_history = []
+    client = None
     
-    if not config.ASSEMBLYAI_API_KEY:
-        logging.error("ASSEMBLYAI_API_KEY not configured")
-        await send_client_message(websocket, {"type": "error", "message": "AssemblyAI API key not configured on the server."})
-        await websocket.close(code=1000)
-        return
-
-    client = StreamingClient(StreamingClientOptions(api_key=config.ASSEMBLYAI_API_KEY))
+    # Wait for API keys from client
+    await send_client_message(websocket, {"type": "status", "message": "Waiting for API keys..."})
 
     def on_turn(self: Type[StreamingClient], event: TurnEvent):
         nonlocal last_processed_transcript, llm_task
@@ -393,23 +334,21 @@ async def websocket_audio_streaming(websocket: WebSocket):
             transcript_message = { "type": "transcription", "text": transcript_text, "end_of_turn": True }
             asyncio.run_coroutine_threadsafe(send_client_message(websocket, transcript_message), main_loop)
             
+            logging.info("Starting LLM response generation...")
             llm_task = asyncio.run_coroutine_threadsafe(get_llm_response_stream(transcript_text, websocket, chat_history), main_loop)
             
         elif transcript_text and transcript_text == last_processed_transcript:
             logging.warning(f"Duplicate turn detected, ignoring: '{transcript_text}'")
 
-    def on_begin(self: Type[StreamingClient], event: BeginEvent): logging.info(f"Transcription session started.")
-    def on_terminated(self: Type[StreamingClient], event: TerminationEvent): logging.info(f"Transcription session terminated.")
-    def on_error(self: Type[StreamingClient], error: StreamingError): logging.error(f"AssemblyAI streaming error: {error}")
-
-    client.on(StreamingEvents.Begin, on_begin)
-    client.on(StreamingEvents.Turn, on_turn)
-    client.on(StreamingEvents.Termination, on_terminated)
-    client.on(StreamingEvents.Error, on_error)
+    def on_begin(self: Type[StreamingClient], event: BeginEvent): 
+        logging.info("Transcription session started.")
+    def on_terminated(self: Type[StreamingClient], event: TerminationEvent): 
+        logging.info("Transcription session terminated.")
+    def on_error(self: Type[StreamingClient], error: StreamingError): 
+        logging.error(f"AssemblyAI streaming error: {error}")
 
     try:
-        client.connect(StreamingParameters(sample_rate=16000, format_turns=True))
-        await send_client_message(websocket, {"type": "status", "message": "Connected to transcription service."})
+        pass  # Connection will be established when API keys are received
 
         while True:
             try:
@@ -425,9 +364,53 @@ async def websocket_audio_streaming(websocket: WebSocket):
                     data = json.loads(message['text'])
                     if data.get("type") == "ping":
                         await websocket.send_text(json.dumps({"type": "pong"}))
+                    elif data.get("type") == "api_keys":
+                        # Store user API keys and initialize clients
+                        global user_api_keys
+                        user_api_keys = data.get("keys", {})
+                        logging.info(f"Received API keys: {list(user_api_keys.keys())}")
+                        
+                        # Validate required keys
+                        required_keys = ['gemini', 'assemblyai', 'murf']
+                        missing_keys = [key for key in required_keys if not user_api_keys.get(key)]
+                        
+                        if missing_keys:
+                            await send_client_message(websocket, {
+                                "type": "error", 
+                                "message": f"Missing required API keys: {', '.join(missing_keys)}"
+                            })
+                            continue
+                        
+                        # Initialize clients with user keys
+                        try:
+                            initialize_clients_with_keys(user_api_keys)
+                            logging.info("Successfully initialized AI clients with user API keys")
+                        except Exception as e:
+                            logging.error(f"Failed to initialize AI clients: {e}")
+                            await send_client_message(websocket, {
+                                "type": "error", 
+                                "message": f"Failed to initialize AI services: {str(e)}"
+                            })
+                            continue
+                        
+                        # Initialize AssemblyAI client
+                        try:
+                            client = StreamingClient(StreamingClientOptions(api_key=user_api_keys['assemblyai']))
+                            client.on(StreamingEvents.Begin, on_begin)
+                            client.on(StreamingEvents.Turn, on_turn)
+                            client.on(StreamingEvents.Termination, on_terminated)
+                            client.on(StreamingEvents.Error, on_error)
+                            
+                            client.connect(StreamingParameters(sample_rate=16000, format_turns=True))
+                            await send_client_message(websocket, {"type": "status", "message": "Connected to transcription service."})
+                            logging.info("AssemblyAI client connected successfully")
+                        except Exception as e:
+                            logging.error(f"Failed to connect to AssemblyAI: {e}")
+                            await send_client_message(websocket, {"type": "error", "message": "Failed to connect to transcription service."})
+                            continue
                 except (json.JSONDecodeError, TypeError): pass
             elif "bytes" in message:
-                if message['bytes']:
+                if message['bytes'] and client:
                     client.stream(message['bytes'])
     except Exception as e:
         logging.error(f"WebSocket error: {e}", exc_info=True)
@@ -435,10 +418,11 @@ async def websocket_audio_streaming(websocket: WebSocket):
         if llm_task and not llm_task.done():
             llm_task.cancel()
         logging.info("Cleaning up connection resources.")
-        client.disconnect()
+        if client:
+            client.disconnect()
         if websocket.client_state.name != 'DISCONNECTED':
             await websocket.close()
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=8019)
