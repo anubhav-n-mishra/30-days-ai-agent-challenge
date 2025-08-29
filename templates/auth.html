@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lelouch AI - Authentication</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            color: #EEEEEE;
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            background: linear-gradient(120deg, #222831 0%, #393E46 50%, #00ADB5 100%);
+            background-size: 200% 200%;
+            animation: gradientMove 8s ease-in-out infinite;
+        }
+        @keyframes gradientMove {
+            0% {background-position: 0% 50%;}
+            50% {background-position: 100% 50%;}
+            100% {background-position: 0% 50%;}
+        }
+        .glass-card {
+            background: rgba(34, 40, 49, 0.45);
+            border-radius: 2rem;
+            box-shadow: 0 8px 32px 0 rgba(0, 173, 181, 0.37);
+            backdrop-filter: blur(24px);
+            border: 1px solid rgba(238, 238, 238, 0.12);
+        }
+    </style>
+</head>
+<body>
+    <div class="flex items-center justify-center min-h-screen p-4">
+        <div class="glass-card w-full max-w-md p-8">
+            <div class="text-center mb-8">
+                <h1 class="text-3xl font-bold" style="color: #EEEEEE;">Lelouch AI</h1>
+                <p class="mt-2" style="color: #00ADB5;">Strategic Intelligence Network</p>
+            </div>
+
+            <div id="authContainer">
+                <!-- Login Form -->
+                <div id="loginForm">
+                    <h2 class="text-xl font-semibold mb-6 text-center" style="color: #EEEEEE;">Sign In</h2>
+                    <form id="loginFormElement" class="space-y-4">
+                        <div>
+                            <input type="email" id="loginEmail" placeholder="Email" required
+                                class="w-full p-3 rounded border" 
+                                style="background-color: #393E46; color: #EEEEEE; border-color: #00ADB5;">
+                        </div>
+                        <div>
+                            <input type="password" id="loginPassword" placeholder="Password" required
+                                class="w-full p-3 rounded border" 
+                                style="background-color: #393E46; color: #EEEEEE; border-color: #00ADB5;">
+                        </div>
+                        <button type="submit" class="w-full py-3 rounded font-semibold transition-all"
+                            style="background-color: #00ADB5; color: #EEEEEE;"
+                            onmouseover="this.style.backgroundColor='#393E46'" 
+                            onmouseout="this.style.backgroundColor='#00ADB5'">
+                            Sign In
+                        </button>
+                    </form>
+                    <p class="text-center mt-4" style="color: #EEEEEE;">
+                        Don't have an account? 
+                        <button id="showSignup" class="underline" style="color: #00ADB5;">Sign Up</button>
+                    </p>
+                </div>
+
+                <!-- Signup Form -->
+                <div id="signupForm" class="hidden">
+                    <h2 class="text-xl font-semibold mb-6 text-center" style="color: #EEEEEE;">Sign Up</h2>
+                    <form id="signupFormElement" class="space-y-4">
+                        <div>
+                            <input type="email" id="signupEmail" placeholder="Email" required
+                                class="w-full p-3 rounded border" 
+                                style="background-color: #393E46; color: #EEEEEE; border-color: #00ADB5;">
+                        </div>
+                        <div>
+                            <input type="password" id="signupPassword" placeholder="Password (min 6 characters)" required
+                                class="w-full p-3 rounded border" 
+                                style="background-color: #393E46; color: #EEEEEE; border-color: #00ADB5;">
+                        </div>
+                        <button type="submit" class="w-full py-3 rounded font-semibold transition-all"
+                            style="background-color: #00ADB5; color: #EEEEEE;"
+                            onmouseover="this.style.backgroundColor='#393E46'" 
+                            onmouseout="this.style.backgroundColor='#00ADB5'">
+                            Sign Up
+                        </button>
+                    </form>
+                    <p class="text-center mt-4" style="color: #EEEEEE;">
+                        Already have an account? 
+                        <button id="showLogin" class="underline" style="color: #00ADB5;">Sign In</button>
+                    </p>
+                </div>
+            </div>
+
+            <div id="statusMessage" class="mt-4 text-center text-sm" style="color: #00ADB5;"></div>
+        </div>
+    </div>
+
+    <script>
+        const supabaseUrl = '{{ supabase_url }}';
+        const supabaseKey = '{{ supabase_key }}';
+        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+        const loginForm = document.getElementById('loginForm');
+        const signupForm = document.getElementById('signupForm');
+        const showSignup = document.getElementById('showSignup');
+        const showLogin = document.getElementById('showLogin');
+        const statusMessage = document.getElementById('statusMessage');
+
+        showSignup.addEventListener('click', () => {
+            loginForm.classList.add('hidden');
+            signupForm.classList.remove('hidden');
+        });
+
+        showLogin.addEventListener('click', () => {
+            signupForm.classList.add('hidden');
+            loginForm.classList.remove('hidden');
+        });
+
+        document.getElementById('loginFormElement').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+
+            try {
+                const { data, error } = await supabase.auth.signInWithPassword({
+                    email: email,
+                    password: password
+                });
+
+                if (error) throw error;
+
+                statusMessage.textContent = 'Login successful! Redirecting...';
+                setTimeout(() => {
+                    window.location.href = '/';
+                }, 1000);
+            } catch (error) {
+                statusMessage.textContent = error.message;
+                statusMessage.style.color = '#393E46';
+            }
+        });
+
+        document.getElementById('signupFormElement').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('signupEmail').value;
+            const password = document.getElementById('signupPassword').value;
+
+            try {
+                const { data, error } = await supabase.auth.signUp({
+                    email: email,
+                    password: password
+                });
+
+                if (error) throw error;
+
+                statusMessage.textContent = 'Account created! Please check your email to verify.';
+                statusMessage.style.color = '#00ADB5';
+            } catch (error) {
+                statusMessage.textContent = error.message;
+                statusMessage.style.color = '#393E46';
+            }
+        });
+
+        // Check if user is already logged in
+        supabase.auth.onAuthStateChange((event, session) => {
+            if (session) {
+                window.location.href = '/';
+            }
+        });
+    </script>
+</body>
+</html>

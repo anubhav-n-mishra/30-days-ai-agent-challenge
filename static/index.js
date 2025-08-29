@@ -21,6 +21,14 @@ document.addEventListener("DOMContentLoaded", () => {
         murf: '',
         tavily: ''
     };
+    
+    // Supabase client
+    const supabaseUrl = 'https://ujkjrntnbhhkaxuhwxhm.supabase.co';
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVqa2pybnRuYmhoa2F4dWh3eGhtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY0ODM3OTYsImV4cCI6MjA3MjA1OTc5Nn0.98sfVBlhnLjicmBuZI-VG3YcoXvBj8fo42bqkQ4Tv20';
+    const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+    
+    let currentUser = null;
+    let chatHistory = [];
 
     const recordBtn = document.getElementById("recordBtn");
     // Persona/voice dropdown removed; always use Lelouch persona
@@ -29,6 +37,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const chatContainer = document.getElementById("chatContainer");
     const clearBtnContainer = document.getElementById("clearBtnContainer");
     const clearBtn = document.getElementById("clearBtn");
+    const saveChatBtn = document.getElementById("saveChatBtn");
+    const historyBtn = document.getElementById("historyBtn");
+    const logoutBtn = document.getElementById("logoutBtn");
+    const userInfo = document.getElementById("userInfo");
     
     // API Modal elements
     const apiModal = document.getElementById("apiModal");
@@ -138,8 +150,56 @@ document.addEventListener("DOMContentLoaded", () => {
     saveKeysBtn.addEventListener("click", saveApiKeys);
     cancelKeysBtn.addEventListener("click", hideApiModal);
     
+    // Authentication functions
+    const checkAuth = async () => {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) {
+            window.location.href = '/auth';
+            return false;
+        }
+        currentUser = user;
+        userInfo.textContent = user.email;
+        return true;
+    };
+    
+    const saveChat = async () => {
+        if (!currentUser || chatHistory.length === 0) return;
+        
+        try {
+            const response = await fetch('/api/save-chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    user_id: currentUser.id,
+                    chat_data: chatHistory
+                })
+            });
+            
+            if (response.ok) {
+                alert('Chat saved successfully!');
+            }
+        } catch (error) {
+            console.error('Error saving chat:', error);
+        }
+    };
+    
+    // Event listeners
+    logoutBtn.addEventListener('click', async () => {
+        await supabase.auth.signOut();
+        window.location.href = '/auth';
+    });
+    
+    historyBtn.addEventListener('click', () => {
+        window.location.href = '/history';
+    });
+    
+    saveChatBtn.addEventListener('click', saveChat);
+    
     // Load stored keys on page load
     loadStoredKeys();
+    
+    // Check authentication on page load
+    checkAuth();
 
     const cleanupResources = () => {
         console.log("🧹 Cleaning up all resources...");
@@ -491,6 +551,7 @@ document.addEventListener("DOMContentLoaded", () => {
             prefixSpan.textContent = 'You: ';
             contentSpan.textContent = text;
             contentSpan.style.color = '#EEEEEE';
+            chatHistory.push({ sender: 'user', text: text, timestamp: new Date().toISOString() });
         } else {
             prefixSpan.className = 'ai-prefix';
             prefixSpan.style.color = '#00ADB5';
@@ -499,6 +560,7 @@ document.addEventListener("DOMContentLoaded", () => {
             contentSpan.style.color = '#EEEEEE';
             if (text) {
                 contentSpan.innerHTML = marked.parse(text);
+                chatHistory.push({ sender: 'ai', text: text, timestamp: new Date().toISOString() });
             }
         }
         
@@ -516,6 +578,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     clearBtn.addEventListener("click", () => {
         chatContainer.innerHTML = '';
+        chatHistory = [];
         clearBtnContainer.classList.add("hidden");
     });
 

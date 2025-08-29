@@ -1,19 +1,21 @@
 import os
 from dotenv import load_dotenv
 import logging
-from fastapi import FastAPI, Request, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, Request, WebSocket, WebSocketDisconnect, HTTPException, Depends
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+from fastapi.responses import RedirectResponse
 from pathlib import Path as PathLib
 import json
 import asyncio
 import config
-from typing import Type, List
+from typing import Type, List, Optional
 import base64
 import websockets
 from datetime import datetime
 import re
 from tavily import TavilyClient
+from supabase import create_client, Client
 
 import assemblyai as aai
 from assemblyai.streaming.v3 import (
@@ -30,6 +32,9 @@ import google.generativeai as genai
 
 # Global variables to store user API keys
 user_api_keys = {}
+
+# Initialize Supabase client
+supabase: Client = create_client(config.SUPABASE_URL, config.SUPABASE_ANON_KEY)
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 app = FastAPI()
@@ -291,9 +296,52 @@ async def get_llm_response_stream(transcript: str, client_websocket: WebSocket, 
         logging.error(f"Error in LLM/TTS streaming function: {e}", exc_info=True)
 
 
+@app.get("/auth")
+async def auth_page(request: Request):
+    return templates.TemplateResponse("auth.html", {
+        "request": request,
+        "supabase_url": config.SUPABASE_URL,
+        "supabase_key": config.SUPABASE_ANON_KEY
+    })
+
 @app.get("/")
 async def home(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
+
+@app.get("/history")
+async def history_page(request: Request):
+    return templates.TemplateResponse("history.html", {
+        "request": request,
+        "supabase_url": config.SUPABASE_URL,
+        "supabase_key": config.SUPABASE_ANON_KEY
+    })
+
+@app.post("/api/save-chat")
+async def save_chat(request: Request):
+    data = await request.json()
+    user_id = data.get('user_id')
+    chat_data = data.get('chat_data')
+    
+    if not user_id or not chat_data:
+        raise HTTPException(status_code=400, detail="Missing user_id or chat_data")
+    
+    try:
+        result = supabase.table('chat_history').insert({
+            'user_id': user_id,
+            'chat_data': chat_data,
+            'created_at': datetime.now().isoformat()
+        }).execute()
+        return {"success": True, "id": result.data[0]['id']}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/chat-history/{user_id}")
+async def get_chat_history(user_id: str):
+    try:
+        result = supabase.table('chat_history').select('*').eq('user_id', user_id).order('created_at', desc=True).execute()
+        return {"success": True, "data": result.data}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 async def send_client_message(ws: WebSocket, message: dict):
     try:
@@ -425,4 +473,5 @@ async def websocket_audio_streaming(websocket: WebSocket):
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8019)
+    port = int(os.environ.get("PORT", 8019))
+    uvicorn.run(app, host="0.0.0.0", port=port)

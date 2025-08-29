@@ -8,6 +8,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -137,7 +138,11 @@
             </div>
         </div>
         <div class="flex items-center space-x-8">
-            <span class="text-sm" style="color: #EEEEEE;">Messages<br><span id="messageCount" class="font-mono">0 messages</span></span>
+            <div class="flex items-center space-x-4">
+                <span class="text-sm" style="color: #EEEEEE;">Messages<br><span id="messageCount" class="font-mono">0 messages</span></span>
+                <div id="userInfo" class="text-sm" style="color: #EEEEEE;"></div>
+                <button id="logoutBtn" class="text-sm px-3 py-1 rounded" style="background-color: #393E46; color: #EEEEEE; border: 1px solid #00ADB5;" onmouseover="this.style.backgroundColor='#00ADB5'" onmouseout="this.style.backgroundColor='#393E46'">Logout</button>
+            </div>
         </div>
     </header>
 
@@ -180,7 +185,10 @@
                     <div class="border rounded-lg p-3 mt-3" style="background: linear-gradient(to right, rgba(0, 173, 181, 0.2), rgba(57, 62, 70, 0.2)); border-color: rgba(0, 173, 181, 0.3);">
                         <p class="text-sm" style="color: #00ADB5;">✨ <strong>New Special Skill:</strong> I can now search the web for the latest news, weather, current events, and up-to-date information!</p>
                     </div>
-                    <button id="configBtn" class="mt-2 text-sm underline" style="color: #00ADB5;" onmouseover="this.style.color='#EEEEEE'" onmouseout="this.style.color='#00ADB5'">Configure API Keys</button>
+                    <div class="flex space-x-4 mt-2">
+                        <button id="configBtn" class="text-sm underline" style="color: #00ADB5;" onmouseover="this.style.color='#EEEEEE'" onmouseout="this.style.color='#00ADB5'">Configure API Keys</button>
+                        <button id="historyBtn" class="text-sm underline" style="color: #00ADB5;" onmouseover="this.style.color='#EEEEEE'" onmouseout="this.style.color='#00ADB5'">Chat History</button>
+                    </div>
                 </div>
                 <!-- Persona/voice dropdown removed. Only Lelouch persona is available. -->
                 <div class="flex justify-center py-4">
@@ -193,7 +201,10 @@
                 </div>
                 <div id="statusDisplay" class="text-lg h-8 transition-all duration-300" style="color: #EEEEEE;">Configure API keys to start</div>
                 <div id="clearBtnContainer" class="pt-4 hidden">
-                    <button id="clearBtn" class="py-2 px-5 border rounded-lg transition-all duration-200 ease-in-out focus:outline-none active:scale-95" style="border-color: rgba(0, 173, 181, 0.5); color: #00ADB5;" onmouseover="this.style.backgroundColor='rgba(0, 173, 181, 0.2)'; this.style.color='#EEEEEE'" onmouseout="this.style.backgroundColor='transparent'; this.style.color='#00ADB5'">Clear Chat</button>
+                    <div class="flex space-x-2">
+                        <button id="clearBtn" class="py-2 px-5 border rounded-lg transition-all duration-200 ease-in-out focus:outline-none active:scale-95" style="border-color: rgba(0, 173, 181, 0.5); color: #00ADB5;" onmouseover="this.style.backgroundColor='rgba(0, 173, 181, 0.2)'; this.style.color='#EEEEEE'" onmouseout="this.style.backgroundColor='transparent'; this.style.color='#00ADB5'">Clear Chat</button>
+                        <button id="saveChatBtn" class="py-2 px-5 border rounded-lg transition-all duration-200 ease-in-out focus:outline-none active:scale-95" style="border-color: rgba(0, 173, 181, 0.5); color: #00ADB5;" onmouseover="this.style.backgroundColor='rgba(0, 173, 181, 0.2)'; this.style.color='#EEEEEE'" onmouseout="this.style.backgroundColor='transparent'; this.style.color='#00ADB5'">Save Chat</button>
+                    </div>
                 </div>
             </div>
             <div class="chat-section flex-1 max-w-lg min-w-[350px] px-2">
