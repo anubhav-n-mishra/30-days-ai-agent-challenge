@@ -104,7 +104,7 @@ Lelouch AI is a sophisticated voice assistant that combines the strategic intell
 
 1. **Clone the Repository**
    ```bash
-   git clone https://github.com/anubhav-n-mishra/30-days-ai-agent-challenge.git
+   git clone https://github.com/anubhav-n-mishra/30-days-ai-agent-challenge/tree/v1
    cd 30-days-ai-agent-challenge
    ```
 
