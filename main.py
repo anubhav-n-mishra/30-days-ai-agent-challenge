@@ -1,7 +1,7 @@
 import os
 from dotenv import load_dotenv
 import logging
-from fastapi import FastAPI, Request, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, Request, WebSocket, WebSocketDisconnect, HTTPException
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from pathlib import Path as PathLib
@@ -14,6 +14,7 @@ import websockets
 from datetime import datetime
 import re
 from tavily import TavilyClient
+from supabase import create_client, Client
 
 import assemblyai as aai
 from assemblyai.streaming.v3 import (
@@ -30,6 +31,9 @@ import google.generativeai as genai
 
 # Global variables to store user API keys
 user_api_keys = {}
+
+# Initialize Supabase client
+supabase: Client = create_client(config.SUPABASE_URL, config.SUPABASE_ANON_KEY)
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 app = FastAPI()
@@ -291,9 +295,63 @@ async def get_llm_response_stream(transcript: str, client_websocket: WebSocket, 
         logging.error(f"Error in LLM/TTS streaming function: {e}", exc_info=True)
 
 
+@app.get("/auth")
+async def auth_page(request: Request):
+    return templates.TemplateResponse("auth.html", {
+        "request": request,
+        "supabase_url": config.SUPABASE_URL,
+        "supabase_key": config.SUPABASE_ANON_KEY
+    })
+
 @app.get("/")
 async def home(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
+
+
+
+@app.post("/api/save-chat")
+async def save_chat(request: Request):
+    data = await request.json()
+    user_id = data.get('user_id')
+    chat_data = data.get('chat_data')
+    
+    if not user_id or not chat_data:
+        raise HTTPException(status_code=400, detail="Missing user_id or chat_data")
+    
+    try:
+        logging.info(f"Attempting to save chat for user: {user_id}")
+        result = supabase.table('chat_history').insert({
+            'user_id': user_id,
+            'chat_data': chat_data
+        }).execute()
+        logging.info(f"Supabase result: {result}")
+        
+        if result.data:
+            return {"success": True, "id": result.data[0]['id']}
+        else:
+            logging.error(f"No data returned from Supabase")
+            return {"success": False, "message": "Failed to save to database"}
+    except Exception as e:
+        logging.error(f"Supabase save error: {e}")
+        return {"success": False, "message": f"Database error: {str(e)}"}
+
+@app.get("/api/chat-history/{user_id}")
+async def get_chat_history(user_id: str):
+    try:
+        result = supabase.table('chat_history').select('*').eq('user_id', user_id).order('created_at', desc=True).execute()
+        return {"success": True, "data": result.data}
+    except Exception as e:
+        logging.error(f"Chat history error: {e}")
+        return {"success": True, "data": []}
+
+@app.delete("/api/delete-chat/{chat_id}")
+async def delete_chat(chat_id: int):
+    try:
+        result = supabase.table('chat_history').delete().eq('id', chat_id).execute()
+        return {"success": True}
+    except Exception as e:
+        logging.error(f"Delete chat error: {e}")
+        return {"success": False, "message": str(e)}
 
 async def send_client_message(ws: WebSocket, message: dict):
     try:
@@ -425,4 +483,4 @@ async def websocket_audio_streaming(websocket: WebSocket):
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8019)
+    uvicorn.run(app, host="0.0.0.0", port=8020)

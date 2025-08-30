@@ -1,18 +1,19 @@
-﻿# 🎭 Lelouch AI - Strategic Voice Assistant
+# 🎭 Lelouch AI - Strategic Voice Assistant
 
 <div align="center">
 
 ![Lelouch AI Banner](https://img.shields.io/badge/Lelouch%20AI-Strategic%20Voice%20Assistant-blue?style=for-the-badge&logo=data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTEyIDJMMTMuMDkgOC4yNkwyMCA5TDEzLjA5IDE1Ljc0TDEyIDIyTDEwLjkxIDE1Ljc0TDQgOUwxMC45MSA4LjI2TDEyIDJaIiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4K)
 
-**An enterprise-grade voice AI assistant with sophisticated conversation capabilities, powered by cutting-edge AI technologies and featuring a stunning glassmorphism interface.**
+**An enterprise-grade voice AI assistant with sophisticated conversation capabilities, web search integration, and a stunning responsive glassmorphism interface.**
 
 [![FastAPI](https://img.shields.io/badge/FastAPI-005571?style=flat&logo=fastapi)](https://fastapi.tiangolo.com/)
 [![AssemblyAI](https://img.shields.io/badge/AssemblyAI-STT-orange)](https://www.assemblyai.com/)
 [![Google Gemini](https://img.shields.io/badge/Google%20Gemini-LLM-blue)](https://ai.google.dev/)
 [![Murf.ai](https://img.shields.io/badge/Murf.ai-TTS-green)](https://murf.ai/)
+[![Supabase](https://img.shields.io/badge/Supabase-Database-green)](https://supabase.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-[🚀 Live Demo](#-getting-started) • [📖 Documentation](#-documentation) • [🎯 Features](#-features) • [🛠️ Tech Stack](#️-technology-stack)
+[🚀 Live Demo](#-getting-started) • [📖 Documentation](#-features) • [🎯 Features](#-features) • [🛠️ Tech Stack](#️-technology-stack)
 
 </div>
 
@@ -20,14 +21,16 @@
 
 ## 🌟 Overview
 
-Lelouch AI is a sophisticated voice assistant that combines the strategic intelligence of its namesake with cutting-edge AI technologies. Built over 12 intensive days of development, it features natural voice interaction, intelligent conversation handling, and a stunning modern interface with glassmorphism design.
+Lelouch AI is a sophisticated voice assistant that combines the strategic intelligence of its namesake with cutting-edge AI technologies. Built with modern web technologies, it features natural voice interaction, intelligent conversation handling, web search capabilities, user authentication, chat history, and a stunning responsive interface with glassmorphism design.
 
 ### ✨ What Makes Lelouch AI Special?
 
 - 🎯 **Strategic Intelligence**: Named after the brilliant strategist, designed for thoughtful, context-aware responses
 - 🗣️ **Natural Voice Interaction**: Seamless speech-to-text and text-to-speech pipeline
+- 🌐 **Web Search Integration**: Real-time information retrieval for current events, weather, and news
+- 👤 **User Authentication**: Secure login system with Supabase integration
+- 💾 **Chat History**: Save and retrieve conversation history across sessions
 - 🎨 **Modern UI/UX**: Professional glassmorphism interface with flowing animations
-- 🧠 **Contextual Conversations**: Maintains conversation history for coherent dialogues
 - 📱 **Fully Responsive**: Perfect experience across desktop, tablet, and mobile devices
 - ⚡ **Production Ready**: Enterprise-grade architecture with comprehensive error handling
 
@@ -39,22 +42,31 @@ Lelouch AI is a sophisticated voice assistant that combines the strategic intell
 - **High-Accuracy Speech Recognition** powered by AssemblyAI
 - **Natural Voice Synthesis** using Murf.ai's premium voices
 - **Real-time Audio Processing** with visual feedback
-- **Multi-format Audio Support** (WAV, MP3, WebM)
+- **Audio Error Recovery** with graceful fallback handling
 
 ### 🤖 **AI Conversation Engine**
 - **Google Gemini Pro Integration** for intelligent responses
+- **Web Search Capability** using Tavily API for current information
 - **Session-based Conversations** with memory persistence
 - **Markdown Rendering** for rich text responses
 - **Context-Aware Dialogues** that remember previous interactions
+
+### 👤 **User Management**
+- **Supabase Authentication** with secure login/logout
+- **Chat History Storage** with persistent database
+- **User-specific Sessions** with personalized experience
+- **Privacy-focused Design** with secure data handling
 
 ### 🎨 **Professional Interface**
 - **Glassmorphism Design** with backdrop blur effects
 - **Animated Gradients** with flowing color transitions
 - **Responsive Layout** optimized for all screen sizes
+- **Mobile-First Design** with hamburger menu for small screens
 - **Accessibility Compliant** with WCAG AA standards
 
 ### 🔧 **Developer Experience**
 - **FastAPI Backend** with automatic API documentation
+- **WebSocket Communication** for real-time interaction
 - **Modular Architecture** for easy customization
 - **Comprehensive Error Handling** with graceful fallbacks
 - **Environment-based Configuration** for different deployment stages
@@ -63,32 +75,16 @@ Lelouch AI is a sophisticated voice assistant that combines the strategic intell
 
 ## 🛠️ Technology Stack
 
-<div align="center">
-
-### Backend Architecture
-```mermaid
-graph TB
-    A[Client Request] --> B[FastAPI Server]
-    B --> C[AssemblyAI STT]
-    B --> D[Google Gemini LLM]
-    B --> E[Murf.ai TTS]
-    C --> F[Text Processing]
-    D --> F
-    F --> E
-    E --> G[Audio Response]
-    G --> H[Client]
-```
-
-</div>
-
 | Layer | Technology | Purpose |
 |-------|------------|---------|
-| **Frontend** | HTML5, CSS3, Vanilla JS | Modern glassmorphism interface |
-| **Backend** | FastAPI (Python) | High-performance API server |
+| **Frontend** | HTML5, CSS3, Vanilla JS | Modern responsive glassmorphism interface |
+| **Backend** | FastAPI (Python) | High-performance API server with WebSocket |
+| **Database** | Supabase | User authentication and chat history storage |
 | **Speech-to-Text** | AssemblyAI | Industry-leading voice recognition |
 | **Language Model** | Google Gemini Pro | Advanced conversation AI |
 | **Text-to-Speech** | Murf.ai | Natural voice synthesis |
-| **Styling** | Custom CSS + Marked.js | Professional design + markdown |
+| **Web Search** | Tavily API | Real-time information retrieval |
+| **Styling** | Custom CSS + Marked.js | Professional design + markdown rendering |
 
 ---
 
@@ -101,6 +97,8 @@ graph TB
   - [AssemblyAI](https://www.assemblyai.com/) (Speech-to-Text)
   - [Google AI Studio](https://ai.google.dev/) (Gemini Pro)
   - [Murf.ai](https://murf.ai/) (Text-to-Speech)
+  - [Tavily](https://tavily.com/) (Web Search - Optional)
+  - [Supabase](https://supabase.com/) (Database & Auth)
 
 ### ⚡ Quick Setup
 
@@ -118,7 +116,7 @@ graph TB
 3. **Configure Environment**
    ```bash
    cp .env.example .env
-   # Edit .env with your API keys (see configuration section below)
+   # Edit .env with your API keys and Supabase configuration
    ```
 
 4. **Launch the Application**
@@ -127,24 +125,22 @@ graph TB
    ```
 
 5. **Access Lelouch AI**
-   Open your browser and navigate to: `http://localhost:8000`
+   Open your browser and navigate to: `http://localhost:8020`
 
 ### 🔑 Environment Configuration
 
-Create a `.env` file in the root directory with the following variables:
+The application uses user-provided API keys through the web interface. Only Supabase configuration is required in the `.env` file:
 
 ```env
-# Required API Keys
-ASSEMBLYAI_API_KEY=your_assemblyai_api_key_here
-GEMINI_API_KEY=your_gemini_api_key_here
-MURF_API_KEY=your_murf_api_key_here
-TAVILY_API_KEY=your_tavily_api_key_here
+# Supabase Configuration (required for authentication and chat history)
+SUPABASE_URL=your_supabase_project_url
+SUPABASE_ANON_KEY=your_supabase_anon_key
 
-# Optional Configuration
-DEBUG=true
-LOG_LEVEL=INFO
-MAX_UPLOAD_SIZE=10485760
-SESSION_TIMEOUT=3600
+# Users provide these API keys through the web interface:
+# - Gemini API Key (Google AI)
+# - AssemblyAI API Key (Speech-to-Text)
+# - Murf API Key (Text-to-Speech)
+# - Tavily API Key (Web Search) - Optional
 ```
 
 ### 🔐 API Key Setup Guide
@@ -156,7 +152,7 @@ SESSION_TIMEOUT=3600
 2. Create a free account
 3. Navigate to your dashboard
 4. Copy your API key
-5. Add to `.env` as `ASSEMBLYAI_API_KEY=your_key_here`
+5. Enter in the web interface when prompted
 
 </details>
 
@@ -167,7 +163,7 @@ SESSION_TIMEOUT=3600
 2. Sign in with your Google account
 3. Create a new API key
 4. Copy the generated key
-5. Add to `.env` as `GEMINI_API_KEY=your_key_here`
+5. Enter in the web interface when prompted
 
 </details>
 
@@ -178,62 +174,56 @@ SESSION_TIMEOUT=3600
 2. Sign up for an account
 3. Navigate to API settings
 4. Generate your API key
-5. Add to `.env` as `MURF_API_KEY=your_key_here`
+5. Enter in the web interface when prompted
 
 </details>
 
 <details>
-<summary><b>🌐 Tavily Setup</b></summary>
+<summary><b>🌐 Tavily Setup (Optional)</b></summary>
 
 1. Visit [Tavily](https://tavily.com/)
 2. Sign up for an account
 3. Navigate to API settings
 4. Generate your API key
-5. Add to `.env` as `TAVILY_API_KEY=your_key_here`
+5. Enter in the web interface when prompted
+
+</details>
+
+<details>
+<summary><b>🗄️ Supabase Setup</b></summary>
+
+1. Visit [Supabase](https://supabase.com/)
+2. Create a new project
+3. Go to Settings > API
+4. Copy your Project URL and anon public key
+5. Add to your `.env` file
 
 </details>
 
 ---
 
-## 🏗️ Architecture & Design
-
-### 🔄 Application Flow
-
-```
-User Speaks → AssemblyAI → Text Processing → Gemini AI → Response → Murf.ai → Audio Output
-     ↑                                                                                ↓
-Voice Interface ←←←←←←←←←←←←←←←← Audio Playback ←←←←←←←←←←←←←←←←←←←←←←←←←←←←←
-```
-
-### 📁 Project Structure
+## 📁 Project Structure
 
 ```
 30-days-ai-agent-challenge/
-├── 📄 README.md                     # You are here!
+├── 📄 README.md                     # Project documentation
 ├── 📄 requirements.txt              # Python dependencies
 ├── 📄 .env.example                  # Environment template
+├── 📄 .env                          # Environment configuration
 ├── 📄 .gitignore                    # Git ignore rules
 ├── 📄 config.py                     # Configuration management
 ├── 📄 main.py                       # FastAPI server with WebSocket support
+├── 📄 API_SETUP.md                  # API setup instructions
+├── 📄 SETUP_INSTRUCTIONS.md         # Detailed setup guide
+├── 📄 RENDER_DEPLOYMENT.md          # Deployment instructions
+├── 📄 render.yaml                   # Render deployment config
 ├── 📁 static/
-│   └── 📄 index.js                  # Enhanced JavaScript with reconnection
-├── 📁 templates/
-│   └── 📄 index.html                # Glassmorphism interface with markdown
+│   └── 📄 index.js                  # Enhanced JavaScript with mobile support
+└── 📁 templates/
+    ├── 📄 index.html                # Main responsive interface
+    ├── 📄 auth.html                 # Authentication page
+    └── 📄 history.html              # Chat history page
 ```
-
-### 🎨 Design Philosophy
-
-**Glassmorphism Interface**: Inspired by modern iOS design principles
-- Backdrop blur effects for depth
-- Subtle transparency layers
-- Smooth animations and transitions
-- Professional color palette with flowing gradients
-
-**User Experience**: Designed for intuitive voice interaction
-- Visual feedback for recording states
-- Real-time conversation display
-- Responsive design for all devices
-- Accessibility-first approach
 
 ---
 
@@ -242,67 +232,92 @@ Voice Interface ←←←←←←←←←←←←←←←← Audio Playback 
 | Endpoint | Method | Description |
 |----------|--------|-------------|
 | `/` | GET | Serve the main application interface |
+| `/auth` | GET | Authentication page |
+| `/history` | GET | Chat history page |
 | `/ws` | WebSocket | Real-time voice communication pipeline |
+| `/api/save-chat` | POST | Save chat conversation to database |
+| `/api/chat-history/{user_id}` | GET | Retrieve user's chat history |
+| `/api/delete-chat/{chat_id}` | DELETE | Delete specific chat session |
 | `/static/{file_path}` | GET | Serve static assets |
-| `/health` | GET | Health check endpoint |
-
-### 📊 API Documentation
-
-When running in development mode, visit:
-- **Swagger UI**: `http://localhost:8000/docs`
-- **ReDoc**: `http://localhost:8000/redoc`
 
 ---
 
 ## 🎮 Usage Guide
 
-### 1. **Start a Conversation**
+### 1. **Authentication**
+   - Visit the application and click "Login"
+   - Sign up or sign in with your email
+   - You'll be redirected to the main interface
+
+### 2. **API Configuration**
+   - Click the "🔑 API Keys" button
+   - Enter your API keys for each service
+   - Required: Gemini, AssemblyAI, Murf
+   - Optional: Tavily (for web search)
+
+### 3. **Start Conversations**
    - Click the microphone button to begin recording
    - Speak clearly in a quiet environment
    - The system will automatically detect speech end
+   - Lelouch AI will respond with voice and text
 
-### 2. **Interact Naturally**
-   - Lelouch AI maintains conversation context
-   - Ask follow-up questions for continued dialogue
-   - Use the clear button to start fresh conversations
-
-### 3. **Advanced Features**
+### 4. **Advanced Features**
    - **Web Search**: Ask about current events, weather, or recent information
-   - **Markdown Responses**: Rich formatting for better readability
+   - **Chat History**: Access previous conversations via the History button
+   - **Mobile Support**: Use the hamburger menu on mobile devices
    - **Voice Interruption**: Stop current playback to ask new questions
 
 ---
 
-## 📈 Performance & Quality
+## 📱 Mobile Experience
 
-- **⚡ Response Time**: < 3 seconds end-to-end
-- **🎯 Accuracy**: 95%+ speech recognition accuracy
-- **📱 Compatibility**: Chrome, Firefox, Safari, Edge
-- **♿ Accessibility**: WCAG AA compliant
-- **🚀 Performance**: Optimized WebSocket connections
+The application is fully responsive with special mobile optimizations:
+
+- **Hamburger Menu**: All controls accessible via mobile menu
+- **Touch-Friendly**: Optimized button sizes and spacing
+- **Responsive Layout**: Adapts to all screen sizes
+- **Mobile-First Design**: Prioritizes mobile user experience
+- **Gesture Support**: Intuitive touch interactions
 
 ---
 
-## 🚧 Development Journey
+## 🔧 Customization
 
-This project represents the culmination of advanced voice AI development, focusing on:
+### 🎨 Theming
+Modify CSS custom properties in templates:
+```css
+:root {
+    --primary: #00ADB5;              /* Teal primary color */
+    --secondary: #393E46;            /* Dark secondary */
+    --background: #222831;           /* Dark background */
+    --glass-bg: rgba(34, 40, 49, 0.45); /* Glass effect */
+}
+```
 
-### **Core Features Implemented**
-- **WebSocket Communication**: Real-time bi-directional communication
-- **Voice Processing Pipeline**: STT → LLM → TTS integration
-- **Web Search Integration**: Tavily API for real-time information
-- **Markdown Rendering**: Rich text formatting for responses
-- **Connection Management**: Robust reconnection handling
-
-### **Technical Achievements**
-- **Production-Ready Code**: Comprehensive error handling
-- **Modern UI/UX**: Glassmorphism design with animations
-- **Performance Optimization**: Efficient resource management
-- **Documentation**: Complete setup and usage guides
+### 🗣️ Voice Configuration
+Adjust voice settings in `main.py`:
+```python
+voice_id = "en-US-william"           # Change voice
+tts_hints = {
+    "pace": 0.92,                    # Speech rate
+    "energy": 0.6,                   # Voice energy
+    "pitch": -0.03                   # Voice pitch
+}
+```
 
 ---
 
 ## 🚀 Deployment
+
+### ☁️ Render Deployment (Recommended)
+
+The project includes `render.yaml` for easy deployment:
+
+1. Fork this repository
+2. Connect your GitHub to Render
+3. Create a new Web Service
+4. Set environment variables in Render dashboard
+5. Deploy automatically
 
 ### 🐳 Docker Deployment
 
@@ -314,41 +329,29 @@ COPY requirements.txt .
 RUN pip install -r requirements.txt
 
 COPY . .
-EXPOSE 8000
+EXPOSE 8020
 
 CMD ["python", "main.py"]
 ```
 
-### ☁️ Cloud Deployment
+### 🌐 Other Platforms
 
 The application is ready for deployment on:
 - **Heroku**: Standard Python web app
 - **AWS/GCP/Azure**: Container or serverless deployment
-- **Railway/Render**: One-click deployment options
+- **Railway**: One-click deployment
+- **Vercel**: Serverless deployment
 
 ---
 
-## 🔧 Customization
+## 📈 Performance & Quality
 
-### 🎨 Theming
-Modify CSS custom properties in `templates/index.html`:
-```css
-:root {
-    --primary: #3b82f6;          /* Primary blue */
-    --primary-hover: #2563eb;    /* Darker blue on hover */
-    --glass-bg: rgba(255, 255, 255, 0.1);  /* Glass background */
-}
-```
-
-### 🗣️ Voice Configuration
-Adjust voice settings in `main.py`:
-```python
-voice_settings = {
-    "voice_id": "en-US-jenny",   # Change voice
-    "speed": 1.0,                # Adjust speech rate
-    "pitch": 1.0,                # Modify voice pitch
-}
-```
+- **⚡ Response Time**: < 3 seconds end-to-end
+- **🎯 Accuracy**: 95%+ speech recognition accuracy
+- **📱 Compatibility**: Chrome, Firefox, Safari, Edge
+- **♿ Accessibility**: WCAG AA compliant
+- **🚀 Performance**: Optimized WebSocket connections
+- **🔒 Security**: Secure authentication and data handling
 
 ---
 
@@ -393,15 +396,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 *Built with ❤️ and strategic intelligence*
 
-</div>I Voice Agent with Web Search
-
-A sophisticated AI voice agent powered by Code Geass's Lelouch vi Britannia persona, featuring real-time web search capabilities, voice-to-voice conversation, and markdown-formatted responses.
-
-##  Features
-
-- ** Lelouch Persona**: Authentic Code Geass character responses with imperial tone
-- ** Web Search Integration**: Real-time information retrieval using Tavily API  
-- ** Voice-to-Voice**: Seamless speech-to-text and text-to-speech conversion
-- ** Markdown Support**: Rich formatting for better readability
-- ** Real-time Streaming**: Live response generation and audio playback
-- ** Auto-reconnection**: Robust WebSocket connection handling
+</div>
