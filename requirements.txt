@@ -1,5 +1,13 @@
 fastapi
 uvicorn
 python-dotenv
+requests
+assemblyai
+Jinja2
+python-multipart
+google-generativeai
+websockets
+tavily-python
+supabase
 httpx
 pydantic
