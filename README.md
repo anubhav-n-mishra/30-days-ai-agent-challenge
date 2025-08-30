@@ -13,7 +13,7 @@
 [![Supabase](https://img.shields.io/badge/Supabase-Database-green)](https://supabase.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-[🚀 Live Demo](#-getting-started) • [📖 Documentation](#-features) • [🎯 Features](#-features) • [🛠️ Tech Stack](#️-technology-stack)
+[🚀 Live Demo](https://lelouch-ai.onrender.com/) • [📖 Documentation](#-features) • [🎯 Features](#-features) • [🛠️ Tech Stack](#️-technology-stack)
 
 </div>
 
