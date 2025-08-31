@@ -65,6 +65,33 @@
             margin-bottom: 120px;
         }
         
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: rgba(34, 40, 49, 0.3);
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #00ADB5, #393E46);
+            border-radius: 10px;
+            border: 1px solid rgba(0, 173, 181, 0.2);
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #393E46, #00ADB5);
+        }
+        
+        /* Firefox scrollbar */
+        * {
+            scrollbar-width: thin;
+            scrollbar-color: #00ADB5 rgba(34, 40, 49, 0.3);
+        }
+        
         /* Mobile-first responsive design */
         @media (max-width: 640px) {
             .content-wrapper {
@@ -387,7 +414,7 @@
         <span class="text-sm md:text-lg flex flex-col md:flex-row items-center justify-center text-center" style="color: #EEEEEE;">
             <span class="flex items-center">Built with <span class="mx-1" style="color: #00ADB5;">♥</span> by Anubhav Mishra</span>
             <span class="hidden md:inline mx-2">|</span>
-            <span class="flex items-center">Enhanced with Web Search 🌐</span>
+            <span class="flex items-center">Powered by <a href="https://murf.ai/api/docs/introduction/overview">Murf</a></span>
         </span>
         <span class="flex items-center space-x-2 mt-2 md:mt-0 md:ml-2">
             <a href="https://github.com/anubhav-n-mishra" target="_blank" class="rounded-lg p-1.5 md:p-2 flex items-center justify-center" style="background-color: #222831;" title="GitHub">
