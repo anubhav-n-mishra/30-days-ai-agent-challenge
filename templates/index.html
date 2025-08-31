@@ -55,6 +55,16 @@
             border-top: 1px solid rgba(238, 238, 238, 0.1);
         }
         
+        #apiModal {
+            z-index: 9999 !important;
+        }
+        
+        #apiModal .glass-card {
+            position: relative;
+            z-index: 10000;
+            margin-bottom: 120px;
+        }
+        
         /* Mobile-first responsive design */
         @media (max-width: 640px) {
             .content-wrapper {
@@ -277,8 +287,8 @@
             </header>
 
     <!-- API Configuration Modal -->
-    <div id="apiModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden p-4">
-        <div class="glass-card max-w-lg w-full mx-2 md:mx-4 p-4 md:p-6 max-h-[90vh] overflow-y-auto">
+    <div id="apiModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999] hidden p-4">
+        <div class="glass-card max-w-lg w-full mx-2 md:mx-4 p-4 md:p-6 max-h-[85vh] overflow-y-auto" style="margin-bottom: 100px;">
             <h2 class="text-xl font-bold mb-4" style="color: #EEEEEE;">Configure API Keys</h2>
             <p class="text-sm mb-6" style="color: #00ADB5;">Get your API keys from the links below to start using Lelouch AI</p>
             
