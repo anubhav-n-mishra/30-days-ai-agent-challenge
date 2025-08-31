@@ -9,3 +9,5 @@ google-generativeai
 websockets
 tavily-python
 supabase
+httpx
+pydantic

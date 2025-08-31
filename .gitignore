@@ -19,11 +19,12 @@ wheels/
 *.egg-info/
 .installed.cfg
 *.egg
-.env
+
 # Virtual Environment
 venv/
 env/
 ENV/
+.venv/
 
 # Environment Variables
 .env
@@ -46,3 +47,4 @@ logs/
 # Temporary files
 *.tmp
 *.temp
+.vercel

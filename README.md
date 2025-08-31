@@ -13,7 +13,7 @@
 [![Supabase](https://img.shields.io/badge/Supabase-Database-green)](https://supabase.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-[🚀 Live Demo](#-getting-started) • [📖 Documentation](#-features) • [🎯 Features](#-features) • [🛠️ Tech Stack](#️-technology-stack)
+[🚀 Live Demo](https://lelouch-ai.onrender.com/) • [📖 Documentation](#-features) • [🎯 Features](#-features) • [🛠️ Tech Stack](#️-technology-stack)
 
 </div>
 
@@ -104,7 +104,7 @@ Lelouch AI is a sophisticated voice assistant that combines the strategic intell
 
 1. **Clone the Repository**
    ```bash
-   git clone https://github.com/anubhav-n-mishra/30-days-ai-agent-challenge.git
+   git clone https://github.com/anubhav-n-mishra/30-days-ai-agent-challenge/tree/v1
    cd 30-days-ai-agent-challenge
    ```
 
